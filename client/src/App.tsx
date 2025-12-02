@@ -50,7 +50,6 @@ const AppContent: React.FC = () => {
   const { user, loading } = useAuth();
   const location = window.location.pathname;
   const isAuthPage = location === '/login' || location === '/register';
-  const isPublicPage = location === '/privacy' || location === '/terms' || location === '/about' || location === '/contact';
 
   if (loading) {
     return (
@@ -80,7 +79,7 @@ const AppContent: React.FC = () => {
           <Route path="/" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
         </Routes>
       </main>
-      {(!isAuthPage || isPublicPage) && <Footer />}
+      <Footer />
     </div>
   );
 };
