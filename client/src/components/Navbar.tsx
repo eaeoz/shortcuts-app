@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useSettings } from '../context/SettingsContext';
-import { Link2, LogOut, LayoutDashboard, Shield, Moon, Sun, Menu, X } from 'lucide-react';
+import { Link2, LogOut, LayoutDashboard, Shield, Moon, Sun, Menu, X, KeyRound } from 'lucide-react';
+import ChangePasswordModal from './ChangePasswordModal';
 
 const Navbar: React.FC = () => {
   const { user, logout, isAdmin } = useAuth();
@@ -11,6 +12,7 @@ const Navbar: React.FC = () => {
   const { settings } = useSettings();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [changePasswordModalOpen, setChangePasswordModalOpen] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -59,6 +61,15 @@ const Navbar: React.FC = () => {
                   <LayoutDashboard className="w-5 h-5" />
                   <span>Dashboard</span>
                 </Link>
+
+                <button
+                  onClick={() => setChangePasswordModalOpen(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl font-medium transition-all duration-200 hover:scale-105"
+                  title="Change Password"
+                >
+                  <KeyRound className="w-5 h-5" />
+                  <span>Password</span>
+                </button>
 
                 {isAdmin && (
                   <Link
@@ -131,6 +142,17 @@ const Navbar: React.FC = () => {
                   <span>Dashboard</span>
                 </Link>
 
+                <button
+                  onClick={() => {
+                    setChangePasswordModalOpen(true);
+                    setMobileMenuOpen(false);
+                  }}
+                  className="flex items-center gap-3 w-full px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl font-medium transition-colors"
+                >
+                  <KeyRound className="w-5 h-5" />
+                  <span>Change Password</span>
+                </button>
+
                 {isAdmin && (
                   <Link
                     to="/admin"
@@ -171,6 +193,12 @@ const Navbar: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Change Password Modal */}
+      <ChangePasswordModal
+        isOpen={changePasswordModalOpen}
+        onClose={() => setChangePasswordModalOpen(false)}
+      />
     </nav>
   );
 };

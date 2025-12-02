@@ -11,6 +11,7 @@ import shortcutRoutes from './routes/shortcuts';
 import adminRoutes from './routes/admin';
 import contactRoutes from './routes/contact';
 import passwordResetRoutes from './routes/password-reset';
+import userRoutes from './routes/user';
 import Settings from './models/Settings';
 import Shortcut from './models/Shortcut';
 
@@ -57,6 +58,7 @@ app.use('/api/shortcuts', shortcutRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/password-reset', passwordResetRoutes);
+app.use('/api/user', userRoutes);
 
 // Public settings endpoint (no auth required)
 app.get('/api/settings', async (req, res) => {
