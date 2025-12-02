@@ -138,7 +138,25 @@ cd ..
 
 4. **Configure environment variables**
 
+⚠️ **IMPORTANT SECURITY NOTE**: 
+- Never commit `.env` files to version control
+- Use `.env.example` as a template for required variables
+- Keep all credentials and secrets secure
+- The `.gitignore` file already excludes `.env` files from Git
+
 Backend `.env` file (root directory):
+Copy `.env.example` to `.env` and fill in your actual values:
+```bash
+cp .env.example .env
+```
+
+Frontend `client/.env` file:
+Copy `client/.env.example` to `client/.env` and fill in your values:
+```bash
+cp client/.env.example client/.env
+```
+
+Example configuration (replace with your actual values):
 ```env
 # MongoDB Configuration
 MONGODB_DB_NAME=shortcuts
@@ -163,16 +181,11 @@ RECIPIENT_EMAIL=your-email@gmail.com
 GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=your-google-client-secret
 GOOGLE_CALLBACK_URL=http://localhost:5000/api/auth/google/callback
+SESSION_SECRET=your-session-secret-key-change-in-production
 
 # reCAPTCHA (Optional)
-RECAPTCHA_SECRET_KEY=your-recaptcha-secret-key
-```
-
-Frontend `client/.env` file:
-```env
-VITE_API_URL=http://localhost:5000
-VITE_MAX_SHORTCUT=10
 VITE_RECAPTCHA_SITE_KEY=your-recaptcha-site-key
+RECAPTCHA_SECRET_KEY=your-recaptcha-secret-key
 ```
 
 5. **Set up Google OAuth 2.0** (Optional)
@@ -646,6 +659,28 @@ SMTP_PASS=your-password
 
 ## Production Deployment
 
+### Security Best Practices
+
+⚠️ **CRITICAL SECURITY REMINDERS**:
+
+1. **Never commit sensitive data**:
+   - `.env` files are excluded via `.gitignore`
+   - Use `.env.example` files as templates
+   - Never hardcode credentials in source code
+   - Review all commits before pushing
+
+2. **Credential Management**:
+   - Use strong, unique secrets for production
+   - Rotate credentials periodically
+   - Use environment variable management tools
+   - Keep production and development credentials separate
+
+3. **Repository Security**:
+   - The `.gitignore` already protects `.env` files
+   - `.env.example` files contain no actual credentials
+   - Review `.git` history if migrating from other repos
+   - Use GitHub's secret scanning if available
+
 ### 1. Environment Setup
 ```env
 NODE_ENV=production
@@ -657,6 +692,7 @@ CLIENT_URL=https://your-domain.com
 GOOGLE_CLIENT_ID=your-production-client-id
 GOOGLE_CLIENT_SECRET=your-production-client-secret
 GOOGLE_CALLBACK_URL=https://your-domain.com/api/auth/google/callback
+SESSION_SECRET=your-production-session-secret
 
 # reCAPTCHA (Production)
 RECAPTCHA_SECRET_KEY=your-production-recaptcha-secret
@@ -687,7 +723,19 @@ cd client && npm run build
 - Traditional hosting: Build and upload dist/ folder
 
 ### 4. Production Checklist
+
+**Security:**
+- ✅ No `.env` files committed to repository
+- ✅ All credentials stored as environment variables
 - ✅ Strong JWT secret generated (min 32 characters)
+- ✅ Strong session secret generated
+- ✅ Production secrets different from development
+- ✅ `.gitignore` properly configured
+- ✅ Reviewed git history for exposed secrets
+- ✅ HTTPS enabled (SSL certificate)
+- ✅ Security headers configured (helmet.js)
+
+**Configuration:**
 - ✅ MongoDB production database configured
 - ✅ CORS origins set to production domain
 - ✅ SMTP credentials for production email
@@ -696,14 +744,14 @@ cd client && npm run build
 - ✅ reCAPTCHA production keys configured
 - ✅ reCAPTCHA domain whitelist updated
 - ✅ Environment variables set on hosting platform
-- ✅ HTTPS enabled (SSL certificate)
 - ✅ Rate limiting configured appropriately
+- ✅ Password reset token expiration configured
+- ✅ File upload limits set
+
+**Monitoring:**
 - ✅ Error logging and monitoring setup
 - ✅ Database backups configured
 - ✅ CDN for static assets (optional)
-- ✅ Security headers configured (helmet.js)
-- ✅ File upload limits set
-- ✅ Password reset token expiration configured
 
 ## Troubleshooting
 
