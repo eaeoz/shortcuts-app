@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
-import { UserPlus, Mail, Lock, User, AlertCircle, Moon, Sun, Key, CheckCircle } from 'lucide-react';
+import { UserPlus, Mail, Lock, User, AlertCircle, Moon, Sun, Key } from 'lucide-react';
 
 const Register: React.FC = () => {
   const [step, setStep] = useState<'form' | 'verification'>('form');
@@ -14,7 +13,6 @@ const Register: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [attemptsRemaining, setAttemptsRemaining] = useState(4);
-  const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
 
   const handleSendVerification = async (e: React.FormEvent) => {

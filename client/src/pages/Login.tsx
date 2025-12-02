@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { LogIn, Mail, Lock, AlertCircle, Moon, Sun } from 'lucide-react';
+import { Mail, Lock, AlertCircle, Moon, Sun } from 'lucide-react';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
