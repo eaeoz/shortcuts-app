@@ -8,7 +8,7 @@ import { adminAuth, AuthRequest } from '../middleware/auth';
 const router = express.Router();
 
 // Get dashboard statistics
-router.get('/stats', adminAuth, async (req: AuthRequest, res: Response) => {
+router.get('/stats', adminAuth as any, async (req: any, res: Response) => {
   try {
     const totalUsers = await User.countDocuments();
     const totalShortcuts = await Shortcut.countDocuments();
@@ -42,7 +42,7 @@ router.get('/stats', adminAuth, async (req: AuthRequest, res: Response) => {
 });
 
 // Get all users
-router.get('/users', adminAuth, async (req: AuthRequest, res: Response) => {
+router.get('/users', adminAuth as any, async (req: any, res: Response) => {
   try {
     const users = await User.find().select('-password').sort({ createdAt: -1 });
     
@@ -60,18 +60,18 @@ router.get('/users', adminAuth, async (req: AuthRequest, res: Response) => {
 });
 
 // Update user information
-router.put('/users/:id', adminAuth, [
+router.put('/users/:id', adminAuth as any, [
   body('username').optional().trim().notEmpty().withMessage('Username cannot be empty'),
   body('email').optional().isEmail().withMessage('Invalid email'),
   body('role').optional().isIn(['user', 'admin']).withMessage('Invalid role')
-], async (req: AuthRequest, res: Response) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+], async (req: any, res: Response) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
 
-    const user = await User.findById(req.params.id);
+      const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -115,21 +115,21 @@ router.put('/users/:id', adminAuth, [
 });
 
 // Update user role
-router.put('/users/:id/role', adminAuth, [
+router.put('/users/:id/role', adminAuth as any, [
   body('role').isIn(['user', 'admin']).withMessage('Invalid role')
-], async (req: AuthRequest, res: Response) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+], async (req: any, res: Response) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
 
-    const user = await User.findById(req.params.id);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
+      const user = await User.findById(req.params.id);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
 
-    user.role = req.body.role;
+      user.role = req.body.role;
     await user.save();
 
     res.json({ message: 'User role updated successfully', user: {
@@ -145,7 +145,7 @@ router.put('/users/:id/role', adminAuth, [
 });
 
 // Delete user
-router.delete('/users/:id', adminAuth, async (req: AuthRequest, res: Response) => {
+router.delete('/users/:id', adminAuth as any, async (req: any, res: Response) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -171,7 +171,7 @@ router.delete('/users/:id', adminAuth, async (req: AuthRequest, res: Response) =
 });
 
 // Get all shortcuts
-router.get('/shortcuts', adminAuth, async (req: AuthRequest, res: Response) => {
+router.get('/shortcuts', adminAuth as any, async (req: any, res: Response) => {
   try {
     const shortcuts = await Shortcut.find()
       .populate('userId', 'username email')
@@ -184,7 +184,7 @@ router.get('/shortcuts', adminAuth, async (req: AuthRequest, res: Response) => {
 });
 
 // Delete shortcut (admin)
-router.delete('/shortcuts/:id', adminAuth, async (req: AuthRequest, res: Response) => {
+router.delete('/shortcuts/:id', adminAuth as any, async (req: any, res: Response) => {
   try {
     const shortcut = await Shortcut.findByIdAndDelete(req.params.id);
     if (!shortcut) {
@@ -199,7 +199,7 @@ router.delete('/shortcuts/:id', adminAuth, async (req: AuthRequest, res: Respons
 });
 
 // Get site settings
-router.get('/settings', adminAuth, async (req: AuthRequest, res: Response) => {
+router.get('/settings', adminAuth as any, async (req: any, res: Response) => {
   try {
     let settings = await Settings.findOne();
     if (!settings) {
@@ -214,20 +214,20 @@ router.get('/settings', adminAuth, async (req: AuthRequest, res: Response) => {
 });
 
 // Update site settings
-router.put('/settings', adminAuth, [
+router.put('/settings', adminAuth as any, [
   body('siteTitle').optional().trim().notEmpty().withMessage('Site title cannot be empty'),
   body('siteIcon').optional().trim(),
   body('siteLogo').optional().trim(),
   body('seoDescription').optional().trim(),
   body('seoKeywords').optional().trim()
-], async (req: AuthRequest, res: Response) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+], async (req: any, res: Response) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
 
-    let settings = await Settings.findOne();
+      let settings = await Settings.findOne();
     if (!settings) {
       settings = new Settings();
     }
@@ -251,7 +251,7 @@ router.put('/settings', adminAuth, [
 });
 
 // Toggle user verification status
-router.put('/users/:id/verify', adminAuth, async (req: AuthRequest, res: Response) => {
+router.put('/users/:id/verify', adminAuth as any, async (req: any, res: Response) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -278,7 +278,7 @@ router.put('/users/:id/verify', adminAuth, async (req: AuthRequest, res: Respons
 });
 
 // Get user's shortcuts
-router.get('/users/:id/shortcuts', adminAuth, async (req: AuthRequest, res: Response) => {
+router.get('/users/:id/shortcuts', adminAuth as any, async (req: any, res: Response) => {
   try {
     const shortcuts = await Shortcut.find({ userId: req.params.id })
       .sort({ createdAt: -1 });
@@ -290,22 +290,22 @@ router.get('/users/:id/shortcuts', adminAuth, async (req: AuthRequest, res: Resp
 });
 
 // Create shortcut for user (admin)
-router.post('/users/:id/shortcuts', adminAuth, [
+router.post('/users/:id/shortcuts', adminAuth as any, [
   body('originalUrl').trim().notEmpty().withMessage('URL is required').isURL().withMessage('Invalid URL'),
   body('shortCode').optional().trim().matches(/^[a-zA-Z0-9_-]{4,}$/).withMessage('Short code must be at least 4 characters and contain only letters, numbers, hyphens, and underscores')
-], async (req: AuthRequest, res: Response) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+], async (req: any, res: Response) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
 
-    const user = await User.findById(req.params.id);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
+      const user = await User.findById(req.params.id);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
 
-    const { originalUrl, shortCode } = req.body;
+      const { originalUrl, shortCode } = req.body;
 
     // Generate short code if not provided
     let finalShortCode = shortCode;
@@ -340,20 +340,20 @@ router.post('/users/:id/shortcuts', adminAuth, [
 });
 
 // Update user's shortcut (admin)
-router.put('/users/:userId/shortcuts/:shortcutId', adminAuth, [
+router.put('/users/:userId/shortcuts/:shortcutId', adminAuth as any, [
   body('originalUrl').optional().trim().isURL().withMessage('Invalid URL'),
   body('shortCode').optional().trim().matches(/^[a-zA-Z0-9_-]{4,}$/).withMessage('Short code must be at least 4 characters and contain only letters, numbers, hyphens, and underscores')
-], async (req: AuthRequest, res: Response) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+], async (req: any, res: Response) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
 
-    const shortcut = await Shortcut.findOne({ 
-      _id: req.params.shortcutId,
-      userId: req.params.userId 
-    });
+      const shortcut = await Shortcut.findOne({ 
+        _id: req.params.shortcutId,
+        userId: req.params.userId 
+      });
 
     if (!shortcut) {
       return res.status(404).json({ message: 'Shortcut not found' });
@@ -384,7 +384,7 @@ router.put('/users/:userId/shortcuts/:shortcutId', adminAuth, [
 });
 
 // Delete user's shortcut (admin)
-router.delete('/users/:userId/shortcuts/:shortcutId', adminAuth, async (req: AuthRequest, res: Response) => {
+router.delete('/users/:userId/shortcuts/:shortcutId', adminAuth as any, async (req: any, res: Response) => {
   try {
     const shortcut = await Shortcut.findOneAndDelete({
       _id: req.params.shortcutId,

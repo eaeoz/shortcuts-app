@@ -7,7 +7,7 @@ const router = express.Router();
 const MAX_SHORTCUT = parseInt(process.env.MAX_SHORTCUT || '10');
 
 // Get all shortcuts for current user
-router.get('/', auth, async (req: AuthRequest, res: Response) => {
+router.get('/', auth as any, async (req: any, res: Response) => {
   try {
     const shortcuts = await Shortcut.find({ userId: req.userId }).sort({ createdAt: -1 });
     res.json({ shortcuts });
@@ -20,7 +20,7 @@ router.get('/', auth, async (req: AuthRequest, res: Response) => {
 // Create shortcut
 router.post(
   '/',
-  auth,
+  auth as any,
   [
     body('originalUrl').isURL().withMessage('Please provide a valid URL'),
     body('shortCode')
@@ -31,7 +31,7 @@ router.post(
       .matches(/^[a-zA-Z0-9_-]+$/)
       .withMessage('Short code can only contain letters, numbers, hyphens, and underscores')
   ],
-  async (req: AuthRequest, res: Response) => {
+  async (req: any, res: Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -81,7 +81,7 @@ router.post(
 // Update shortcut
 router.put(
   '/:id',
-  auth,
+  auth as any,
   [
     body('originalUrl').optional().isURL().withMessage('Please provide a valid URL'),
     body('shortCode')
@@ -92,7 +92,7 @@ router.put(
       .matches(/^[a-zA-Z0-9_-]+$/)
       .withMessage('Short code can only contain letters, numbers, hyphens, and underscores')
   ],
-  async (req: AuthRequest, res: Response) => {
+  async (req: any, res: Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -130,7 +130,7 @@ router.put(
 );
 
 // Delete shortcut
-router.delete('/:id', auth, async (req: AuthRequest, res: Response) => {
+router.delete('/:id', auth as any, async (req: any, res: Response) => {
   try {
     const shortcut = await Shortcut.findOneAndDelete({ _id: req.params.id, userId: req.userId });
 
