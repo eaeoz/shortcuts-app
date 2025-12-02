@@ -17,6 +17,24 @@ router.get('/', auth as any, async (req: any, res: Response) => {
   }
 });
 
+// Check if a shortcode is available (globally across all users)
+router.get('/check/:shortCode', auth as any, async (req: any, res: Response) => {
+  try {
+    const { shortCode } = req.params;
+    
+    // Check if shortcode exists globally (any user)
+    const exists = await Shortcut.findOne({ shortCode });
+    
+    res.json({ 
+      available: !exists,
+      shortCode: shortCode
+    });
+  } catch (error) {
+    console.error('Check shortcode error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Create shortcut
 router.post(
   '/',

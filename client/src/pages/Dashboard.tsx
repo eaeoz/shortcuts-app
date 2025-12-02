@@ -20,6 +20,7 @@ const Dashboard: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [checkingAvailability, setCheckingAvailability] = useState(false);
   const maxShortcuts = parseInt(import.meta.env.VITE_MAX_SHORTCUT || '10');
 
   useEffect(() => {
@@ -272,24 +273,36 @@ const Dashboard: React.FC = () => {
                   <input
                     type="text"
                     value={shortCode}
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       const value = e.target.value;
                       setShortCode(value);
                       
-                      // Real-time duplicate check
+                      // Real-time global availability check
                       if (value.trim().length >= 4) {
-                        const existingShortcut = shortcuts.find(s => s.shortCode === value.trim() && s._id !== editingId);
-                        if (existingShortcut) {
-                          setError(`Short code "${value.trim()}" is already in use. Please choose a different code.`);
-                        } else {
-                          setError('');
+                        setCheckingAvailability(true);
+                        try {
+                          const response = await axios.get(`/api/shortcuts/check/${value.trim()}`);
+                          if (!response.data.available) {
+                            setError(`Short code "${value.trim()}" is already in use by another user. Please choose a different code.`);
+                          } else {
+                            // Clear error if it was about shortcode availability
+                            if (error.includes('already in use')) {
+                              setError('');
+                            }
+                          }
+                        } catch (err) {
+                          console.error('Error checking shortcode availability:', err);
+                        } finally {
+                          setCheckingAvailability(false);
                         }
+                      } else if (value.trim().length > 0 && value.trim().length < 4) {
+                        setError('');
                       }
                     }}
                     minLength={4}
                     pattern="[a-zA-Z0-9_\-]+"
                     className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-indigo-500/20 dark:bg-gray-700 dark:text-white transition-all ${
-                      shortCode.trim().length >= 4 && shortcuts.find(s => s.shortCode === shortCode.trim() && s._id !== editingId)
+                      error.includes('Short code') && error.includes('already in use')
                         ? 'border-red-500 dark:border-red-500 focus:border-red-500'
                         : 'border-gray-300 dark:border-gray-600 focus:border-indigo-500'
                     }`}
@@ -299,7 +312,13 @@ const Dashboard: React.FC = () => {
                     <span className="text-indigo-600 dark:text-indigo-400 font-medium">ℹ</span>
                     <span>Minimum 4 characters. Only letters, numbers, hyphens, and underscores. Leave empty for auto-generation.</span>
                   </p>
-                  {shortCode.trim().length >= 4 && !shortcuts.find(s => s.shortCode === shortCode.trim() && s._id !== editingId) && (
+                  {checkingAvailability && shortCode.trim().length >= 4 && (
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 flex items-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-indigo-600 border-t-transparent"></div>
+                      <span>Checking availability...</span>
+                    </p>
+                  )}
+                  {!checkingAvailability && shortCode.trim().length >= 4 && !error.includes('Short code') && (
                     <p className="text-sm text-green-600 dark:text-green-400 mt-2 flex items-center gap-2">
                       <CheckCircle className="w-4 h-4" />
                       <span>This short code is available!</span>
