@@ -35,8 +35,11 @@ Your backend is already configured for production. The `src/server.ts` uses envi
    - **Work directory**: `/` (root directory - leave empty or set to `/`)
    - **Build command**: `npm run build`
    - **Run command**: `npm start`
-   - **Port**: `5000`
+   - **Port**: `5000` ⚠️ IMPORTANT: This must match PORT env var
+   - **Health checks**: HTTP on port `5000` path `/api/health`
    - **Instance type**: Select appropriate size (Free tier or Nano for testing)
+   
+   **⚠️ Critical**: Make sure the "Exposed Port" in Koyeb is set to `5000`, not 8000!
    
    **Note**: The build script automatically:
    - Installs root dependencies (Koyeb does this)
@@ -51,6 +54,8 @@ Your backend is already configured for production. The `src/server.ts` uses envi
    ```env
    NODE_ENV=production
    PORT=5000
+   
+   ⚠️ CRITICAL: Ensure PORT=5000 matches the "Exposed Port" setting in Koyeb!
    
    # MongoDB
    MONGODB_URI=mongodb+srv://sedat:YOUR_PASSWORD@cluster0.aqhcv7a.mongodb.net/shortcuts
@@ -339,6 +344,33 @@ The `client/netlify.toml` file specifies Node.js version 20:
   NODE_VERSION = "20"
 ```
 If you see this error, ensure the netlify.toml file has been pushed to your repository.
+
+### Issue: Koyeb "TCP health check failed on port 8000"
+
+**Solution**:
+Your server runs on port 5000, but Koyeb is checking port 8000. Fix this:
+
+1. **In Koyeb Dashboard**:
+   - Go to your app → Settings → Deployment
+   - Find "Exposed Ports" section
+   - Change port from `8000` to `5000`
+   - Protocol: `HTTP`
+   
+2. **Configure Health Check**:
+   - Health check type: `HTTP`
+   - Port: `5000`
+   - Path: `/api/health`
+   - Initial delay: `10` seconds
+   - Timeout: `5` seconds
+   - Interval: `30` seconds
+
+3. **Verify Environment Variable**:
+   - Ensure `PORT=5000` is set in environment variables
+   - This must match the exposed port
+
+4. **Redeploy** after making these changes
+
+**Why this happens**: The default exposed port might be 8000, but your Node.js app listens on PORT environment variable (5000).
 
 ---
 
