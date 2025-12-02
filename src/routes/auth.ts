@@ -454,15 +454,18 @@ router.get(
 
 router.get(
   '/google/callback',
-  passport.authenticate('google', { 
-    failureRedirect: `${process.env.CLIENT_URL}/login?error=oauth_failed`,
-    session: false 
-  }),
-  async (req: any, res: Response) => {
-    try {
-      const user = req.user;
+  (req: any, res: Response, next: any) => {
+    passport.authenticate('google', { session: false }, (err: any, user: any, info: any) => {
+      if (err) {
+        console.error('Google auth error:', err);
+        return res.redirect(`${process.env.CLIENT_URL}/login?error=oauth_failed`);
+      }
       
       if (!user) {
+        // Check if there's a message about unverified account
+        if (info && info.message && info.message.includes('unverified')) {
+          return res.redirect(`${process.env.CLIENT_URL}/login?error=unverified`);
+        }
         return res.redirect(`${process.env.CLIENT_URL}/login?error=no_user`);
       }
 
@@ -479,10 +482,7 @@ router.get(
 
       // Redirect to dashboard
       res.redirect(`${process.env.CLIENT_URL}/dashboard`);
-    } catch (error) {
-      console.error('Google callback error:', error);
-      res.redirect(`${process.env.CLIENT_URL}/login?error=callback_failed`);
-    }
+    })(req, res, next);
   }
 );
 

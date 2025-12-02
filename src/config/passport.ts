@@ -35,6 +35,10 @@ passport.use(
         let user = await User.findOne({ googleId: profile.id });
 
         if (user) {
+          // Check if user is verified
+          if (!user.isVerified) {
+            return done(null, false, { message: 'Account is unverified or suspended. Please contact administrator.' });
+          }
           // User exists, update last login
           user.lastLogin = new Date();
           await user.save();
@@ -45,11 +49,14 @@ passport.use(
         user = await User.findOne({ email: profile.emails?.[0]?.value });
 
         if (user) {
+          // Check if existing user is verified
+          if (!user.isVerified) {
+            return done(null, false, { message: 'Account is unverified or suspended. Please contact administrator.' });
+          }
           // Link Google account to existing user
           user.googleId = profile.id;
           user.authProvider = 'google';
           user.avatar = profile.photos?.[0]?.value;
-          user.isVerified = true; // Google accounts are verified
           user.lastLogin = new Date();
           await user.save();
           return done(null, user);

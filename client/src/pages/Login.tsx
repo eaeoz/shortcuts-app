@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -14,6 +14,32 @@ const Login: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const { executeRecaptcha } = useGoogleReCaptcha();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Check for OAuth errors in URL
+  useEffect(() => {
+    const errorParam = searchParams.get('error');
+    if (errorParam) {
+      switch (errorParam) {
+        case 'unverified':
+          setError('🚫 Account Unverified or Suspended - Your account is not verified. Please contact the administrator to activate your account.');
+          break;
+        case 'oauth_failed':
+          setError('❌ Google Sign-In Failed - Unable to authenticate with Google. Please try again or use email/password.');
+          break;
+        case 'no_user':
+          setError('❌ Authentication Failed - Unable to retrieve user information. Please try again.');
+          break;
+        case 'callback_failed':
+          setError('❌ Callback Error - An error occurred during authentication. Please try again.');
+          break;
+        default:
+          setError('❌ An error occurred during sign-in. Please try again.');
+      }
+      // Clear the error from URL after displaying
+      window.history.replaceState({}, '', '/login');
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
