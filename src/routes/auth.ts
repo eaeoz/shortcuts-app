@@ -420,19 +420,21 @@ router.post('/logout', (req: express.Request, res: Response) => {
 });
 
 // Get current user
-router.get('/me', auth, async (req: AuthRequest, res: Response) => {
+router.get('/me', auth as any, async (req: any, res: Response) => {
   try {
-    if (!req.user) {
+    const user = req.user as any;
+    
+    if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
     res.json({
       user: {
-        id: req.user._id,
-        username: req.user.username,
-        email: req.user.email,
-        role: req.user.role,
-        avatar: req.user.avatar
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar
       }
     });
   } catch (error) {
