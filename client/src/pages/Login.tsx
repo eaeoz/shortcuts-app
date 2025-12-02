@@ -30,18 +30,6 @@ const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 px-4 py-8 sm:px-6 lg:px-8 relative transition-colors duration-300">
-      {/* Theme Toggle Button */}
-      <button
-        onClick={toggleTheme}
-        className="absolute top-4 right-4 sm:top-6 sm:right-6 p-3 sm:p-3.5 rounded-xl bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl border border-gray-200 dark:border-gray-700 transition-all duration-200 hover:scale-110 z-10"
-        title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-      >
-        {theme === 'light' ? (
-          <Moon className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700 dark:text-gray-300" />
-        ) : (
-          <Sun className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400" />
-        )}
-      </button>
 
       <div className="max-w-md w-full space-y-8">
         {/* Logo and Header */}
@@ -58,17 +46,46 @@ const Login: React.FC = () => {
         </div>
 
         {/* Login Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 sm:p-8 lg:p-10 transition-colors duration-300">
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-600 rounded-lg">
-              <div className="flex items-center gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" />
-                <span className="text-sm font-medium text-red-800 dark:text-red-200">{error}</span>
-              </div>
-            </div>
-          )}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 transition-colors duration-300 relative">
+          {/* Theme Toggle Switch - At the top of card */}
+          <div className="flex justify-end items-center gap-3 px-6 sm:px-8 lg:px-10 pt-6 pb-4 border-b border-gray-100 dark:border-gray-700">
+            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+              {theme === 'light' ? 'Light' : 'Dark'}
+            </span>
+            <button
+              onClick={toggleTheme}
+              className="relative inline-flex h-7 w-12 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+              style={{
+                backgroundColor: theme === 'dark' ? '#4f46e5' : '#e5e7eb'
+              }}
+              title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+            >
+              <span
+                className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow-lg transition-transform duration-200 ${
+                  theme === 'dark' ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              >
+                {theme === 'light' ? (
+                  <Sun className="h-3 w-3 text-yellow-500" />
+                ) : (
+                  <Moon className="h-3 w-3 text-indigo-600" />
+                )}
+              </span>
+            </button>
+          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="p-6 sm:p-8 lg:p-10">
+
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-600 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" />
+                  <span className="text-sm font-medium text-red-800 dark:text-red-200">{error}</span>
+                </div>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                 Email Address <span className="text-red-500">*</span>
@@ -104,32 +121,33 @@ const Login: React.FC = () => {
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 sm:py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm sm:text-base"
-            >
-              {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-                  Signing in...
-                </span>
-              ) : (
-                '✓ Sign In'
-              )}
-            </button>
-          </form>
-
-          <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-            <p className="text-center text-sm sm:text-base text-gray-600 dark:text-gray-400">
-              Don't have an account?{' '}
-              <Link 
-                to="/register" 
-                className="font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 sm:py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm sm:text-base"
               >
-                Sign up for free
-              </Link>
-            </p>
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                    Signing in...
+                  </span>
+                ) : (
+                  '✓ Sign In'
+                )}
+              </button>
+            </form>
+
+            <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+              <p className="text-center text-sm sm:text-base text-gray-600 dark:text-gray-400">
+                Don't have an account?{' '}
+                <Link 
+                  to="/register" 
+                  className="font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
+                >
+                  Sign up for free
+                </Link>
+              </p>
+            </div>
           </div>
         </div>
 
