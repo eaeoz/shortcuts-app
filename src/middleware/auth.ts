@@ -13,6 +13,12 @@ export const auth = async (req: AuthRequest, res: Response, next: NextFunction):
   try {
     const token = req.cookies.token || req.header('Authorization')?.replace('Bearer ', '');
 
+    console.log('🔍 Auth Middleware Check:');
+    console.log('  Cookies:', req.cookies);
+    console.log('  Token found:', !!token);
+    console.log('  Origin:', req.get('origin'));
+    console.log('  Referer:', req.get('referer'));
+
     if (!token) {
       res.status(401).json({ message: 'No authentication token, access denied' });
       return;
