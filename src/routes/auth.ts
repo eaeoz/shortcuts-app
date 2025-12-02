@@ -450,6 +450,19 @@ router.get('/me', auth as any, async (req: any, res: Response) => {
   }
 });
 
+// Debug endpoint to check cookie configuration
+router.get('/debug/config', (req: express.Request, res: Response) => {
+  res.json({
+    CLIENT_URL: process.env.CLIENT_URL,
+    isProduction,
+    cookieSettings: getCookieSettings(),
+    headers: {
+      origin: req.get('origin'),
+      referer: req.get('referer'),
+    }
+  });
+});
+
 // Google OAuth Routes
 router.get(
   '/google',
