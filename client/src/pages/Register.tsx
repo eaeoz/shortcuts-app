@@ -2,19 +2,22 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { UserPlus, Mail, Lock, User, AlertCircle, Moon, Sun } from 'lucide-react';
+import { UserPlus, Mail, Lock, User, AlertCircle, Moon, Sun, Key, CheckCircle } from 'lucide-react';
 
 const Register: React.FC = () => {
+  const [step, setStep] = useState<'form' | 'verification'>('form');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { register } = useAuth();
+  const [attemptsRemaining, setAttemptsRemaining] = useState(4);
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSendVerification = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -31,16 +34,58 @@ const Register: React.FC = () => {
     setLoading(true);
 
     try {
-      await register(username, email, password);
-      navigate('/dashboard');
+      const response = await fetch('http://localhost:5000/api/auth/send-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ username, email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setStep('verification');
+        setAttemptsRemaining(4);
+      } else {
+        setError(data.message || data.errors?.[0]?.msg || 'Failed to send verification code');
+      }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      setError('Network error. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const { theme, toggleTheme } = useTheme();
+  const handleVerifyEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/verify-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, code: verificationCode }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Account created and logged in, redirect to dashboard
+        window.location.href = '/dashboard';
+      } else {
+        setError(data.message || 'Verification failed');
+        if (data.attemptsRemaining !== undefined) {
+          setAttemptsRemaining(data.attemptsRemaining);
+        }
+      }
+    } catch (err: any) {
+      setError('Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 px-4 py-8 sm:px-6 lg:px-8 relative transition-colors duration-300">
@@ -48,13 +93,17 @@ const Register: React.FC = () => {
         {/* Logo and Header */}
         <div className="text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-lg mb-6 transform hover:scale-110 transition-transform duration-200">
-            <UserPlus className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+            {step === 'form' ? (
+              <UserPlus className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+            ) : (
+              <Key className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+            )}
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent mb-3">
-            Create Account
+            {step === 'form' ? 'Create Account' : 'Verify Email'}
           </h1>
           <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
-            Sign up to get started with Shortcuts
+            {step === 'form' ? 'Sign up to get started with Shortcuts' : 'Enter the 6-digit code sent to your email'}
           </p>
         </div>
 
@@ -88,7 +137,6 @@ const Register: React.FC = () => {
           </div>
 
           <div className="p-6 sm:p-8 lg:p-10">
-
             {error && (
               <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-600 rounded-lg">
                 <div className="flex items-center gap-3">
@@ -98,93 +146,155 @@ const Register: React.FC = () => {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Username <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
-                  <input
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    required
-                    minLength={3}
-                    className="w-full pl-12 pr-4 py-3 sm:py-3.5 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-all text-sm sm:text-base"
-                    placeholder="johndoe"
-                  />
+            {/* Registration Form */}
+            {step === 'form' && (
+              <form onSubmit={handleSendVerification} className="space-y-6">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Username <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
+                    <input
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      required
+                      minLength={3}
+                      className="w-full pl-12 pr-4 py-3 sm:py-3.5 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-all text-sm sm:text-base"
+                      placeholder="johndoe"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Email Address <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="w-full pl-12 pr-4 py-3 sm:py-3.5 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-all text-sm sm:text-base"
-                    placeholder="you@example.com"
-                  />
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Email Address <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="w-full pl-12 pr-4 py-3 sm:py-3.5 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-all text-sm sm:text-base"
+                      placeholder="you@example.com"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Password <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    minLength={6}
-                    className="w-full pl-12 pr-4 py-3 sm:py-3.5 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-all text-sm sm:text-base"
-                    placeholder="Min. 6 characters"
-                  />
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Password <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      minLength={6}
+                      className="w-full pl-12 pr-4 py-3 sm:py-3.5 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-all text-sm sm:text-base"
+                      placeholder="Min. 6 characters"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Confirm Password <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
-                  <input
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                    minLength={6}
-                    className="w-full pl-12 pr-4 py-3 sm:py-3.5 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-all text-sm sm:text-base"
-                    placeholder="Confirm password"
-                  />
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Confirm Password <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
+                    <input
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                      minLength={6}
+                      className="w-full pl-12 pr-4 py-3 sm:py-3.5 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-all text-sm sm:text-base"
+                      placeholder="Confirm password"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3 sm:py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm sm:text-base"
-              >
-                {loading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-                    Creating Account...
-                  </span>
-                ) : (
-                  '✓ Sign Up'
-                )}
-              </button>
-            </form>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3 sm:py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm sm:text-base"
+                >
+                  {loading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                      Sending Code...
+                    </span>
+                  ) : (
+                    '📧 Send Verification Code'
+                  )}
+                </button>
+              </form>
+            )}
+
+            {/* Verification Form */}
+            {step === 'verification' && (
+              <form onSubmit={handleVerifyEmail} className="space-y-6">
+                <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 mb-4">
+                  <p className="text-sm text-indigo-800 dark:text-indigo-200">
+                    📧 Code sent to: <strong>{email}</strong>
+                  </p>
+                  <p className="text-xs text-indigo-600 dark:text-indigo-300 mt-1">
+                    ⏱️ Valid for 15 minutes | 🔢 {attemptsRemaining} attempts remaining
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    6-Digit Verification Code
+                  </label>
+                  <div className="relative">
+                    <Key className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                      type="text"
+                      value={verificationCode}
+                      onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      required
+                      maxLength={6}
+                      className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-all text-center text-2xl tracking-widest font-bold"
+                      placeholder="000000"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3 sm:py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm sm:text-base"
+                >
+                  {loading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                      Verifying...
+                    </span>
+                  ) : (
+                    '✓ Verify & Create Account'
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStep('form');
+                    setVerificationCode('');
+                    setError('');
+                  }}
+                  className="w-full text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium"
+                >
+                  ← Back to Registration
+                </button>
+              </form>
+            )}
 
             <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
               <p className="text-center text-sm sm:text-base text-gray-600 dark:text-gray-400">
