@@ -123,6 +123,7 @@ const Login: React.FC = () => {
                 </label>
                 <Link
                   to="/forgot-password"
+                  tabIndex={-1}
                   className="text-xs sm:text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
                 >
                   Forgot password?
