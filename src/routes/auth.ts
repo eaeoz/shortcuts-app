@@ -260,7 +260,8 @@ router.post(
       res.cookie('token', token, {
         httpOnly: true,
         maxAge: USER_TIMEOUT,
-        sameSite: 'strict'
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        secure: process.env.NODE_ENV === 'production'
       });
 
       console.log(`✅ User registered successfully: ${email}`);
@@ -327,7 +328,8 @@ router.post(
       res.cookie('token', token, {
         httpOnly: true,
         maxAge: USER_TIMEOUT,
-        sameSite: 'strict'
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        secure: process.env.NODE_ENV === 'production'
       });
 
       res.status(201).json({
@@ -394,7 +396,8 @@ router.post(
       res.cookie('token', token, {
         httpOnly: true,
         maxAge: USER_TIMEOUT,
-        sameSite: 'strict'
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        secure: process.env.NODE_ENV === 'production'
       });
 
       res.json({
@@ -476,7 +479,7 @@ router.get(
       res.cookie('token', token, {
         httpOnly: true,
         maxAge: USER_TIMEOUT,
-        sameSite: 'lax',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         secure: process.env.NODE_ENV === 'production'
       });
 
