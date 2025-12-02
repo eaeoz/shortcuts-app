@@ -42,7 +42,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, onClo
 
     try {
       await axios.post(
-        'http://localhost:5000/api/user/change-password',
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/user/change-password`,
         {
           newPassword,
           confirmPassword,
