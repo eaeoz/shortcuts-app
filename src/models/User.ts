@@ -8,6 +8,9 @@ export interface IUser extends Document {
   isVerified: boolean;
   createdAt: Date;
   lastLogin?: Date;
+  googleId?: string;
+  authProvider: 'local' | 'google';
+  avatar?: string;
 }
 
 const userSchema = new Schema<IUser>({
@@ -27,8 +30,24 @@ const userSchema = new Schema<IUser>({
   },
   password: {
     type: String,
-    required: true,
+    required: function(this: IUser) {
+      return this.authProvider === 'local';
+    },
     minlength: 6
+  },
+  googleId: {
+    type: String,
+    sparse: true,
+    unique: true
+  },
+  authProvider: {
+    type: String,
+    enum: ['local', 'google'],
+    default: 'local',
+    required: true
+  },
+  avatar: {
+    type: String
   },
   role: {
     type: String,

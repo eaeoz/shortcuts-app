@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { body, validationResult } from 'express-validator';
 import rateLimit from 'express-rate-limit';
 import nodemailer from 'nodemailer';
+import passport from 'passport';
 import User from '../models/User';
 import { auth, AuthRequest } from '../middleware/auth';
 import { verifyRecaptchaLenient } from '../middleware/recaptcha';
@@ -430,7 +431,8 @@ router.get('/me', auth, async (req: AuthRequest, res: Response) => {
         id: req.user._id,
         username: req.user.username,
         email: req.user.email,
-        role: req.user.role
+        role: req.user.role,
+        avatar: req.user.avatar
       }
     });
   } catch (error) {
@@ -438,5 +440,45 @@ router.get('/me', auth, async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
+// Google OAuth Routes
+router.get(
+  '/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+router.get(
+  '/google/callback',
+  passport.authenticate('google', { 
+    failureRedirect: `${process.env.CLIENT_URL}/login?error=oauth_failed`,
+    session: false 
+  }),
+  async (req: any, res: Response) => {
+    try {
+      const user = req.user;
+      
+      if (!user) {
+        return res.redirect(`${process.env.CLIENT_URL}/login?error=no_user`);
+      }
+
+      // Create JWT token
+      const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: `${USER_TIMEOUT}ms` });
+
+      // Set cookie
+      res.cookie('token', token, {
+        httpOnly: true,
+        maxAge: USER_TIMEOUT,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production'
+      });
+
+      // Redirect to dashboard
+      res.redirect(`${process.env.CLIENT_URL}/dashboard`);
+    } catch (error) {
+      console.error('Google callback error:', error);
+      res.redirect(`${process.env.CLIENT_URL}/login?error=callback_failed`);
+    }
+  }
+);
 
 export default router;

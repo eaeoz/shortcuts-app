@@ -1,9 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import session from 'express-session';
 import dotenv from 'dotenv';
 import path from 'path';
 import connectDB from './config/database';
+import passport from './config/passport';
 import authRoutes from './routes/auth';
 import shortcutRoutes from './routes/shortcuts';
 import adminRoutes from './routes/admin';
@@ -30,6 +32,24 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser());
+
+// Session middleware (required for Passport)
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'your-session-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    },
+  })
+);
+
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 // API Routes
 app.use('/api/auth', authRoutes);
