@@ -451,6 +451,44 @@ router.get('/me', auth as any, async (req: any, res: Response) => {
   }
 });
 
+// Exchange token for cookie (for OAuth callback)
+router.post('/set-cookie', async (req: express.Request, res: Response) => {
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({ message: 'Token is required' });
+    }
+
+    // Verify token
+    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    
+    // Get user to return user data
+    const user = await User.findById(decoded.userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Set cookie with the provided token
+    res.cookie('token', token, getCookieSettings());
+
+    console.log('✅ Cookie set for user:', user.email);
+
+    res.json({
+      message: 'Cookie set successfully',
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role
+      }
+    });
+  } catch (error) {
+    console.error('Set cookie error:', error);
+    res.status(401).json({ message: 'Invalid token' });
+  }
+});
+
 // Debug endpoint to check cookie configuration
 router.get('/debug/config', (req: express.Request, res: Response) => {
   res.json({
@@ -493,19 +531,12 @@ router.get(
       // Create JWT token
       const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: `${USER_TIMEOUT}ms` });
 
-      console.log('🍪 Google OAuth - Setting cookie for user:', user.email);
-      console.log('🍪 Token:', token.substring(0, 20) + '...');
-      console.log('🍪 Cookie settings:', getCookieSettings());
+      console.log('🍪 Google OAuth - Creating token for user:', user.email);
+      console.log('🔄 Redirecting with token to frontend');
 
-      // Set cookie
-      const cookieSettings = getCookieSettings();
-      res.cookie('token', token, cookieSettings);
-      
-      console.log('🍪 Cookie header should be set');
-      console.log('🔄 Redirecting to:', `${process.env.CLIENT_URL}/dashboard`);
-
-      // Redirect to dashboard
-      res.redirect(`${process.env.CLIENT_URL}/dashboard`);
+      // Pass token to frontend via URL parameter
+      // Frontend will set the cookie via a subsequent API call
+      res.redirect(`${process.env.CLIENT_URL}/auth/callback?token=${token}`);
     })(req, res, next);
   }
 );
