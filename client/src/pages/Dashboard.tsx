@@ -43,6 +43,16 @@ const Dashboard: React.FC = () => {
     setError('');
     setSuccess('');
 
+    // Client-side validation: Check if custom short code already exists
+    if (shortCode) {
+      const trimmedCode = shortCode.trim();
+      const existingShortcut = shortcuts.find(s => s.shortCode === trimmedCode && s._id !== editingId);
+      if (existingShortcut) {
+        setError(`Short code "${trimmedCode}" is already in use. Please choose a different code.`);
+        return;
+      }
+    }
+
     try {
       if (editingId) {
         await axios.put(`/api/shortcuts/${editingId}`, { originalUrl, shortCode: shortCode || undefined });
@@ -218,16 +228,39 @@ const Dashboard: React.FC = () => {
                   <input
                     type="text"
                     value={shortCode}
-                    onChange={(e) => setShortCode(e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setShortCode(value);
+                      
+                      // Real-time duplicate check
+                      if (value.trim().length >= 4) {
+                        const existingShortcut = shortcuts.find(s => s.shortCode === value.trim() && s._id !== editingId);
+                        if (existingShortcut) {
+                          setError(`Short code "${value.trim()}" is already in use. Please choose a different code.`);
+                        } else {
+                          setError('');
+                        }
+                      }
+                    }}
                     minLength={4}
                     pattern="[a-zA-Z0-9_\-]+"
-                    className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-all"
+                    className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-indigo-500/20 dark:bg-gray-700 dark:text-white transition-all ${
+                      shortCode.trim().length >= 4 && shortcuts.find(s => s.shortCode === shortCode.trim() && s._id !== editingId)
+                        ? 'border-red-500 dark:border-red-500 focus:border-red-500'
+                        : 'border-gray-300 dark:border-gray-600 focus:border-indigo-500'
+                    }`}
                     placeholder="my-custom-link"
                   />
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 flex items-start gap-2">
                     <span className="text-indigo-600 dark:text-indigo-400 font-medium">ℹ</span>
                     <span>Minimum 4 characters. Only letters, numbers, hyphens, and underscores. Leave empty for auto-generation.</span>
                   </p>
+                  {shortCode.trim().length >= 4 && !shortcuts.find(s => s.shortCode === shortCode.trim() && s._id !== editingId) && (
+                    <p className="text-sm text-green-600 dark:text-green-400 mt-2 flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4" />
+                      <span>This short code is available!</span>
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 pt-4">
