@@ -1,0 +1,147 @@
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
+import { LogIn, Mail, Lock, AlertCircle, Moon, Sun } from 'lucide-react';
+
+const Login: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
+  const { theme, toggleTheme } = useTheme();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      await login(email, password);
+      navigate('/dashboard');
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Login failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 px-4 py-8 sm:px-6 lg:px-8 relative transition-colors duration-300">
+      {/* Theme Toggle Button */}
+      <button
+        onClick={toggleTheme}
+        className="absolute top-4 right-4 sm:top-6 sm:right-6 p-3 sm:p-3.5 rounded-xl bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl border border-gray-200 dark:border-gray-700 transition-all duration-200 hover:scale-110 z-10"
+        title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+      >
+        {theme === 'light' ? (
+          <Moon className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700 dark:text-gray-300" />
+        ) : (
+          <Sun className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400" />
+        )}
+      </button>
+
+      <div className="max-w-md w-full space-y-8">
+        {/* Logo and Header */}
+        <div className="text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-lg mb-6 transform hover:scale-110 transition-transform duration-200">
+            <LogIn className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+          </div>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent mb-3">
+            Welcome Back
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
+            Sign in to your account to continue
+          </p>
+        </div>
+
+        {/* Login Card */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 sm:p-8 lg:p-10 transition-colors duration-300">
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-600 rounded-lg">
+              <div className="flex items-center gap-3">
+                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" />
+                <span className="text-sm font-medium text-red-800 dark:text-red-200">{error}</span>
+              </div>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Email Address <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full pl-12 pr-4 py-3 sm:py-3.5 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-all text-sm sm:text-base"
+                  placeholder="you@example.com"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Password <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  className="w-full pl-12 pr-4 py-3 sm:py-3.5 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-all text-sm sm:text-base"
+                  placeholder="••••••••"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 sm:py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm sm:text-base"
+            >
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                  Signing in...
+                </span>
+              ) : (
+                '✓ Sign In'
+              )}
+            </button>
+          </form>
+
+          <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <p className="text-center text-sm sm:text-base text-gray-600 dark:text-gray-400">
+              Don't have an account?{' '}
+              <Link 
+                to="/register" 
+                className="font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
+              >
+                Sign up for free
+              </Link>
+            </p>
+          </div>
+        </div>
+
+        {/* Footer Text */}
+        <div className="text-center">
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-500">
+            By signing in, you agree to our Terms of Service and Privacy Policy
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
