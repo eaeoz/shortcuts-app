@@ -50,8 +50,6 @@ const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 const AppContent: React.FC = () => {
   const { user, loading } = useAuth();
-  const location = window.location.pathname;
-  const isAuthPage = location === '/login' || location === '/register' || location === '/forgot-password';
 
   if (loading) {
     return (
@@ -63,7 +61,7 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
-      {!isAuthPage && <Navbar />}
+      <Navbar />
       <main className="flex-grow">
         <Routes>
           <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
