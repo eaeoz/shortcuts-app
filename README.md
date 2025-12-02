@@ -2,121 +2,204 @@
 
 A modern, full-stack URL shortener application with user authentication, admin dashboard, Google OAuth, reCAPTCHA protection, and comprehensive security features.
 
-## Features
+## 📚 Documentation
 
-### User Features
-- 🔐 **User Authentication** - Secure login and registration with JWT + Google OAuth
-- 🔗 **URL Shortening** - Create custom or auto-generated short URLs
-- ✏️ **URL Management** - Edit, delete, and track your shortcuts
-- 📊 **Click Analytics** - Track clicks on your shortened URLs
-- 🎨 **Custom Short Codes** - Choose your own memorable short codes (min 4 characters)
-- 🔄 **Duplicate Prevention** - Real-time validation prevents duplicate URLs and short codes
-- 🌓 **Dark/Light Theme** - Toggle between dark and light modes with persistent preference
-- 📱 **Fully Responsive** - Optimized for all devices including small mobiles (370px+)
-- ⚡ **Real-time Updates** - Instant feedback on all actions
-- 📧 **Contact Form** - Get in touch with support via email
-- 🔑 **Password Reset** - Secure password recovery via email with token verification
-- 🔒 **Change Password** - Update password from user profile
-- 📄 **Footer Pages** - Privacy Policy, Terms of Service, About Us
+| Document | Description |
+|----------|-------------|
+| [SECURITY.md](SECURITY.md) | Comprehensive security implementation guide |
+| [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) | Complete deployment instructions |
+| [GOOGLE_OAUTH_SETUP.md](GOOGLE_OAUTH_SETUP.md) | Google OAuth 2.0 setup guide |
+| [RECAPTCHA_SETUP.md](RECAPTCHA_SETUP.md) | reCAPTCHA configuration guide |
+| [MIGRATION.md](MIGRATION.md) | Database migration guide |
+| [SECURITY_ROTATION_GUIDE.md](SECURITY_ROTATION_GUIDE.md) | Credential rotation procedures |
+| [ATTACK_PROTECTION.md](ATTACK_PROTECTION.md) | Attack prevention strategies |
+| [CLIENT_SECURITY.md](CLIENT_SECURITY.md) | Client-side security measures |
+| [CSP_AND_CONFIG_FIX.md](CSP_AND_CONFIG_FIX.md) | Content Security Policy fixes |
+| [NETLIFY_DEPLOYMENT_CHECKLIST.md](NETLIFY_DEPLOYMENT_CHECKLIST.md) | Netlify deployment checklist |
+| [REDIRECT_FIX.md](REDIRECT_FIX.md) | Redirect issue fixes |
+| [HARDCODED_URLS_FIXED.md](HARDCODED_URLS_FIXED.md) | URL configuration fixes |
 
-### Authentication Features
-- 🔐 **Traditional Auth** - Email/password with JWT tokens
-- 🌐 **Google OAuth 2.0** - One-click login with Google account
-- 🤖 **reCAPTCHA v2** - Bot protection on registration and sensitive operations
-- 🔑 **Forgot Password** - Email-based password reset with secure tokens
-- ⏱️ **Session Management** - Configurable session timeout (USER_TIMEOUT)
-- 🍪 **HTTP-Only Cookies** - Secure token storage
+## 🚀 Features
 
-### Admin Features
-- 👥 **User Management** - View, edit, and manage all users
-  - Change usernames and emails
-  - Toggle user roles (user ↔ admin)
+### 🔐 Authentication & Security
+- **Multi-Method Authentication**
+  - Traditional email/password with JWT tokens
+  - Google OAuth 2.0 single sign-on
+  - HTTP-only secure cookies
+  - Configurable session timeout (USER_TIMEOUT)
+- **Advanced Security**
+  - Password hashing with bcryptjs (10 rounds)
+  - Rate limiting on all endpoints (configurable)
+  - reCAPTCHA v2 bot protection
+  - Role-based access control (User/Admin)
+  - CORS configuration with whitelisted origins
+  - Security headers via Helmet.js
+  - MongoDB injection prevention
+  - XSS and CSRF protection
+- **Password Management**
+  - Forgot password with email recovery
+  - Secure token-based password reset (1-hour expiry)
+  - User password change from profile
+  - Admin password change for users
+
+### 🔗 URL Shortening
+- **Smart URL Shortening**
+  - Auto-generation with collision detection
+  - Custom short codes (4+ characters, alphanumeric + hyphens/underscores)
+  - Real-time duplicate URL detection (case-insensitive)
+  - Real-time duplicate code validation
+  - Edit mode with intelligent validation
+  - Maximum shortcuts per user (configurable via MAX_SHORTCUT)
+- **Analytics & Tracking**
+  - Click counting per shortcut
+  - Last accessed timestamp
+  - Creation date tracking
+  - Total clicks across all shortcuts
+
+### 👥 User Management
+- **User Dashboard**
+  - View all personal shortcuts
+  - Create, edit, and delete shortcuts
+  - Copy short links to clipboard
+  - Track clicks and creation dates
+  - Responsive card-based layout
+  - Dark/light theme toggle with persistence
+- **Profile Features**
+  - Change password securely
+  - View account information
+  - Manage personal settings
+
+### 👨‍💼 Admin Panel
+- **Dashboard & Analytics**
+  - Total users, shortcuts, and clicks statistics
+  - Top 10 performing shortcuts with bar charts (Recharts)
+  - Visual analytics and insights
+  - Real-time data updates
+- **User Management**
+  - View all users with search and sorting
+  - Edit username, email, and role
+  - Toggle admin/user roles
   - Verify/unverify users
-  - Delete users (with cascade deletion of shortcuts)
   - Change user passwords administratively
-- 🔗 **URL Management** - Monitor and manage all shortcuts
-  - View shortcuts by user
+  - Delete users (with cascade deletion of shortcuts)
+  - View user shortcuts in modal
+- **Shortcut Management**
+  - View all shortcuts across users
+  - Search by code or URL
+  - Sort by clicks, code, or owner
   - Delete any shortcut
-  - See click statistics
-  - Track creation dates
-- 📈 **Dashboard Statistics** - View total users, shortcuts, and clicks
-- 📊 **Analytics Charts** - Visual representation of top shortcuts with Recharts
-- ⚙️ **Site Settings** - Configure site title, icon, logo, and SEO metadata
-- 🎨 **Branding Control** - Customize site appearance and identity
-- 📱 **Mobile Admin Panel** - Fully responsive admin interface for mobile devices
-- 👤 **User Shortcuts Modal** - View and manage shortcuts for specific users
-  - Add shortcuts for users
-  - Edit user shortcuts
-  - Delete user shortcuts
-  - View detailed analytics
+  - View owner information
+  - Add/edit shortcuts for specific users
+- **Site Settings**
+  - Configure site title and branding
+  - Set site icon (favicon) and logo
+  - Update SEO metadata (description, keywords)
+  - Changes apply immediately site-wide
+- **Mobile Responsive**
+  - Fully responsive admin panel (370px+)
+  - Card view for mobile devices
+  - Table view for desktop
+  - Touch-friendly controls
 
-### Security Features
-- 🛡️ **Rate Limiting** - Protection against brute force attacks
-  - Login/Register: 5 failed attempts per 15 minutes (smart counting)
+### 📧 Communication
+- **Contact Form**
+  - Email support via SMTP (Nodemailer)
+  - Rate limited to prevent spam
+  - reCAPTCHA protection
+  - Configurable recipient email
+- **Email Features**
+  - Password reset emails with secure links
+  - Contact form submissions
+  - HTML email templates
+
+### 🎨 User Experience
+- **Responsive Design**
+  - Mobile-first approach
+  - Optimized for screens 370px and up
+  - Tablet and desktop layouts
+  - Touch-friendly controls
+- **Theme Support**
+  - Dark mode
+  - Light mode
+  - Persistent theme preference
+  - Smooth transitions
+- **User Feedback**
+  - Real-time validation indicators
+  - Success/error notifications
+  - Loading states
+  - Confirmation dialogs
+- **Footer Pages**
+  - Privacy Policy
+  - Terms of Service
+  - About Us page
+  - Contact information
+
+### 🛡️ Rate Limiting
+- **Public Endpoints**
+  - `/api/health`: 30 requests per 5 minutes
+  - `/api/status`: 100 requests per 15 minutes
+  - `/api/settings`: 100 requests per 15 minutes
+  - `/api/contact`: 10 requests per 15 minutes
+- **Authentication**
+  - Login/Register: 5 failed attempts per 15 minutes
   - Password Reset: 5 requests per 15 minutes
-  - Contact Form: 5 submissions per 15 minutes
-- 🤖 **reCAPTCHA v2** - Bot protection on registration and sensitive forms
-- 🔒 **Password Hashing** - bcryptjs with salt (10 rounds)
-- 🎫 **JWT Authentication** - Secure token-based auth with expiration
-- 🍪 **HTTP-Only Cookies** - Protection against XSS attacks
-- ✅ **Input Validation** - Comprehensive validation with express-validator
-- 🔐 **Role-Based Access Control** - User and admin roles
-- 🌐 **CORS Configuration** - Whitelisted origins only
-- 📧 **Email Validation** - Regex pattern matching and duplicate checking
-- 🔑 **Password Reset Tokens** - Secure, time-limited reset tokens
-- 🚫 **Duplicate Prevention** - Real-time URL and short code duplicate checking
+  - Smart counting (successful logins don't count)
 
-### URL Shortening Features
-- ⚡ **Auto-Generation** - Random short codes (6 characters)
-- 🎨 **Custom Codes** - User-defined codes (min 4 characters, alphanumeric + hyphens/underscores)
-- 🔄 **Duplicate Detection** - Real-time validation prevents:
-  - Duplicate URLs (case-insensitive)
-  - Duplicate short codes
-  - Conflicts during auto-generation (server-side retry logic)
-- ✏️ **Edit Mode** - Modify URLs and codes without false duplicate warnings
-- 📊 **Click Tracking** - Accurate click counting per shortcut
-- ⏱️ **Last Accessed** - Track when shortcuts were last used
-- 🎯 **User Limits** - Configurable maximum shortcuts per user (MAX_SHORTCUT)
+### 🔍 API Documentation
+- **Interactive API Docs**
+  - Available at http://localhost:5000 (root)
+  - Health check endpoint with system info
+  - Status endpoint with API version
+  - Complete endpoint documentation
+  - Real-time API status indicator
+  - Test health check button
 
-## Tech Stack
+## 💻 Tech Stack
 
 ### Backend
-- **Node.js** with **TypeScript**
-- **Express.js** - Web framework
-- **MongoDB** with **Mongoose** - Database
-- **Passport.js** - Authentication middleware
-- **Google OAuth 2.0** - Social login
-- **JWT** - Token-based authentication
-- **bcryptjs** - Password hashing
-- **express-validator** - Input validation
-- **express-rate-limit** - DDoS and brute force protection
-- **nodemailer** - Email sending (contact form & password reset)
-- **cookie-parser** - Cookie handling
-- **cors** - Cross-origin resource sharing
-- **crypto** - Secure token generation for password reset
+| Technology | Purpose |
+|------------|---------|
+| **Node.js** + **TypeScript** | Runtime and type safety |
+| **Express.js** | Web framework |
+| **MongoDB** + **Mongoose** | Database and ODM |
+| **Passport.js** | Authentication middleware |
+| **Google OAuth 2.0** | Social login |
+| **JWT** | Token-based authentication |
+| **bcryptjs** | Password hashing |
+| **express-validator** | Input validation |
+| **express-rate-limit** | DDoS protection |
+| **Helmet** | Security headers |
+| **nodemailer** | Email sending |
+| **cookie-parser** | Cookie handling |
+| **cors** | Cross-origin resource sharing |
+| **crypto** | Secure token generation |
+| **hpp** | HTTP parameter pollution prevention |
+| **compression** | Response compression |
 
 ### Frontend
-- **React 18** with **TypeScript**
-- **Vite** - Build tool and dev server
-- **React Router v6** - Client-side routing
-- **Axios** - HTTP client with interceptors
-- **Tailwind CSS** - Utility-first styling
-- **Lucide React** - Beautiful icon library
-- **Recharts** - Data visualization and charts
-- **Context API** - State management (Auth, Theme, Settings)
-- **Google reCAPTCHA** - Bot protection integration
+| Technology | Purpose |
+|------------|---------|
+| **React 18** + **TypeScript** | UI library and type safety |
+| **Vite** | Build tool and dev server |
+| **React Router v6** | Client-side routing |
+| **Axios** | HTTP client with interceptors |
+| **Tailwind CSS** | Utility-first styling |
+| **Lucide React** | Icon library |
+| **Recharts** | Data visualization |
+| **Context API** | State management (Auth, Theme, Settings) |
+| **Google reCAPTCHA** | Bot protection |
 
-## Installation
+## 📦 Installation
 
 ### Prerequisites
 - Node.js (v18 or higher)
-- MongoDB Atlas account or local MongoDB instance
+- MongoDB Atlas account or local MongoDB
 - npm or yarn package manager
-- SMTP credentials (for contact form and password reset emails)
-- Google OAuth 2.0 credentials (optional, for social login)
-- Google reCAPTCHA v2 keys (optional, for bot protection)
+- SMTP credentials (for emails)
+- Google OAuth 2.0 credentials (optional)
+- Google reCAPTCHA v2 keys (optional)
 
-### Setup Steps
+### Quick Start
 
 1. **Clone the repository**
 ```bash
@@ -124,86 +207,32 @@ git clone https://github.com/eaeoz/shortcuts-app.git
 cd shortcuts-app
 ```
 
-2. **Install backend dependencies**
+2. **Install dependencies**
 ```bash
+# Backend
 npm install
-```
 
-3. **Install frontend dependencies**
-```bash
+# Frontend
 cd client
 npm install
 cd ..
 ```
 
-4. **Configure environment variables**
+3. **Configure environment variables**
 
-⚠️ **IMPORTANT SECURITY NOTE**: 
-- Never commit `.env` files to version control
-- Use `.env.example` as a template for required variables
-- Keep all credentials and secrets secure
-- The `.gitignore` file already excludes `.env` files from Git
+⚠️ **SECURITY NOTE**: Never commit `.env` files. Use `.env.example` as template.
 
-Backend `.env` file (root directory):
-Copy `.env.example` to `.env` and fill in your actual values:
 ```bash
+# Backend .env
 cp .env.example .env
-```
 
-Frontend `client/.env` file:
-Copy `client/.env.example` to `client/.env` and fill in your values:
-```bash
+# Frontend .env
 cp client/.env.example client/.env
 ```
 
-Example configuration (replace with your actual values):
-```env
-# MongoDB Configuration
-MONGODB_DB_NAME=shortcuts
-MONGODB_URI=mongodb+srv://your-username:your-password@cluster.mongodb.net/
+Edit both `.env` files with your actual credentials (see [Environment Variables](#environment-variables) section).
 
-# Application Settings
-MAX_SHORTCUT=10
-USER_TIMEOUT=1440
-JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
-PORT=5000
-CLIENT_URL=http://localhost:5173
-NODE_ENV=development
-
-# Email Configuration (for contact form & password reset)
-SMTP_HOST=smtp.yandex.com
-SMTP_PORT=587
-SMTP_USER=your-email@yandex.com
-SMTP_PASS=your-app-password
-RECIPIENT_EMAIL=your-email@gmail.com
-
-# Google OAuth 2.0 (Optional)
-GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=your-google-client-secret
-GOOGLE_CALLBACK_URL=http://localhost:5000/api/auth/google/callback
-SESSION_SECRET=your-session-secret-key-change-in-production
-
-# reCAPTCHA (Optional)
-VITE_RECAPTCHA_SITE_KEY=your-recaptcha-site-key
-RECAPTCHA_SECRET_KEY=your-recaptcha-secret-key
-```
-
-5. **Set up Google OAuth 2.0** (Optional)
-
-See [GOOGLE_OAUTH_SETUP.md](GOOGLE_OAUTH_SETUP.md) for detailed instructions on:
-- Creating a Google Cloud project
-- Configuring OAuth consent screen
-- Generating OAuth 2.0 credentials
-- Setting up authorized redirect URIs
-
-6. **Set up Google reCAPTCHA** (Optional)
-
-See [RECAPTCHA_SETUP.md](RECAPTCHA_SETUP.md) for detailed instructions on:
-- Registering your site with Google reCAPTCHA
-- Getting site and secret keys
-- Testing reCAPTCHA locally
-
-7. **Start the development servers**
+4. **Start development servers**
 
 **Terminal 1 - Backend:**
 ```bash
@@ -216,674 +245,452 @@ cd client
 npm run dev
 ```
 
-The application will be available at:
+5. **Access the application**
 - Frontend: http://localhost:5173
 - Backend API: http://localhost:5000
+- API Docs: http://localhost:5000 (root)
 
-## Usage
+## ⚙️ Environment Variables
 
-### User Workflow
-
-1. **Register/Login**
-   - Navigate to http://localhost:5173
-   - **Traditional Registration:**
-     - Enter username, email, and password (min 6 characters)
-     - Complete reCAPTCHA verification (if enabled)
-     - Verify email (if email verification is enabled)
-   - **Google OAuth Login:**
-     - Click "Sign in with Google" button
-     - Authorize with your Google account
-     - Automatic account creation or login
-   - **Existing Users:**
-     - Login with email/username and password
-     - Or use "Sign in with Google"
-   - Theme preference is saved and persists across sessions
-
-2. **Forgot Password**
-   - Click "Forgot Password?" on login page
-   - Enter your registered email
-   - Check email for password reset link
-   - Click link (valid for 1 hour)
-   - Set new password
-   - Login with new credentials
-
-3. **Create Shortcuts**
-   - Click "New Shortcut" button on dashboard
-   - Enter the original URL (with http:// or https://)
-   - **Duplicate URL Prevention:**
-     - Real-time check if URL already has a shortcut
-     - Shows existing short code if duplicate found
-     - Case-insensitive URL matching
-   - Choose generation method:
-     - **Auto-generate**: System creates random short code (with collision detection)
-     - **Custom**: Enter your own code (min 4 characters, alphanumeric + hyphens/underscores)
-   - **Custom Code Validation:**
-     - Real-time duplicate checking
-     - Green checkmark for available codes
-     - Red border and error for taken codes
-   - Click "Create Shortcut"
-   - Maximum 10 shortcuts per user (configurable via MAX_SHORTCUT)
-
-4. **Manage Shortcuts**
-   - View all your shortcuts on the dashboard with click counts
-   - Copy short links to clipboard with one click
-   - Edit shortcut details (URL and custom code)
-   - **Edit Mode Features:**
-     - Can keep same URL without false duplicate warnings
-     - Can keep same code without false duplicate warnings
-     - Validates new URLs and codes against other shortcuts
-   - Delete shortcuts you no longer need (with confirmation)
-   - Track clicks and creation dates
-   - Beautiful card-based responsive layout
-
-5. **Access Shortened URLs**
-   - Use the format: `http://localhost:5000/s/YOUR_SHORT_CODE`
-   - Automatically redirects to the original URL
-   - Click count increments with each visit
-   - Last accessed timestamp updates
-
-6. **Change Password**
-   - Navigate to profile/settings
-   - Enter current password
-   - Enter new password (min 6 characters)
-   - Confirm new password
-   - Password updated securely
-
-7. **Contact Support**
-   - Navigate to the Contact page from footer
-   - Fill out the form with your name, email, subject, and message
-   - Complete reCAPTCHA verification (if enabled)
-   - Receive confirmation when message is sent
-   - Emails are sent via SMTP to configured recipient
-
-### Admin Workflow
-
-1. **Create Admin User**
-   - Register a regular user account
-   - Connect to MongoDB directly and change the user's `role` field to "admin"
-   - Or promote existing users from the admin panel once you have initial admin access
-
-2. **Access Admin Panel**
-   - Login with admin credentials
-   - "Admin" link appears in navigation bar
-   - Access restricted to users with admin role
-   - Fully responsive interface for mobile and desktop
-
-3. **Admin Dashboard**
-   - View comprehensive statistics:
-     - Total users registered
-     - Total shortcuts created
-     - Total clicks across all shortcuts
-   - See top 10 performing shortcuts with bar charts
-   - Visual analytics with Recharts
-   - Real-time data updates
-   - Responsive card layout for mobile
-
-4. **Manage Users**
-   - **Desktop View**: Full table with all user information
-   - **Mobile View**: Responsive card layout (370px+)
-   - Search users by username or email
-   - Sort by: Username, Email, or Creation Date
-   - View user details:
-     - Username and email
-     - Role (user/admin)
-     - Verification status (verified/unverified)
-     - Creation date
-   - **User Actions:**
-     - **Edit**: Update username, email, and role
-     - **Change Password**: Administratively change user password
-     - **Toggle Role**: Switch between user and admin roles
-     - **Toggle Verification**: Verify or unverify users
-     - **Delete**: Remove user account (with cascade deletion)
-     - **View Shortcuts**: Open modal to see user's shortcuts
-   - All changes confirmed before execution
-
-5. **View User Shortcuts**
-   - Click on username to open shortcuts modal
-   - See all shortcuts for specific user
-   - View detailed information:
-     - Short code with clicks
-     - Original URL
-     - Creation date
-   - **User Shortcut Management:**
-     - Add new shortcuts for the user
-     - Edit existing shortcuts
-     - Delete shortcuts
-     - Open shortcuts in new tab
-   - Modal is fully responsive for mobile devices
-
-6. **Manage URLs (All Shortcuts)**
-   - **Desktop View**: Full table with shortcut details
-   - **Mobile View**: Responsive card layout with:
-     - Short code and click counter
-     - Target URL in contained box
-     - Owner username with avatar
-     - Delete action
-   - Search shortcuts by code or URL
-   - Sort by: Clicks, Short Code, or Owner
-   - View shortcut details:
-     - Short code
-     - Original URL (truncated in table)
-     - Owner username and avatar
-     - Total clicks
-   - Delete any shortcut with confirmation
-   - Click owner name to view their shortcuts
-
-7. **Site Settings**
-   - Update site title (appears in browser tab)
-   - Configure site icon URL (favicon)
-   - Set site logo URL (in header)
-   - Update SEO description (meta description)
-   - Set SEO keywords (meta keywords)
-   - Changes apply immediately across the site
-   - Accessible to all authenticated users
-
-## API Endpoints
-
-### Authentication
-- `POST /api/auth/register` - Register new user (rate limited, reCAPTCHA protected)
-- `POST /api/auth/login` - Login user (rate limited)
-- `POST /api/auth/logout` - Logout user
-- `GET /api/auth/me` - Get current user info
-- `GET /api/auth/google` - Initiate Google OAuth flow
-- `GET /api/auth/google/callback` - Google OAuth callback
-- `POST /api/password-reset/request` - Request password reset (rate limited)
-- `POST /api/password-reset/reset` - Reset password with token
-- `POST /api/password-reset/validate-token` - Validate reset token
-
-### User Management (Protected)
-- `PUT /api/user/change-password` - Change user password
-
-### Shortcuts (Protected)
-- `GET /api/shortcuts` - Get user's shortcuts
-- `POST /api/shortcuts` - Create new shortcut (with duplicate validation)
-- `PUT /api/shortcuts/:id` - Update shortcut (with duplicate validation)
-- `DELETE /api/shortcuts/:id` - Delete shortcut
-
-### Admin (Admin Only)
-- `GET /api/admin/stats` - Get dashboard statistics
-- `GET /api/admin/users` - Get all users
-- `PUT /api/admin/users/:id` - Update user (username, email, role)
-- `PUT /api/admin/users/:id/role` - Update user role
-- `PUT /api/admin/users/:id/verify` - Toggle user verification
-- `PUT /api/admin/users/:id/change-password` - Change user password administratively
-- `DELETE /api/admin/users/:id` - Delete user
-- `GET /api/admin/users/:userId/shortcuts` - Get shortcuts for specific user
-- `POST /api/admin/users/:userId/shortcuts` - Create shortcut for user
-- `PUT /api/admin/users/:userId/shortcuts/:id` - Update user's shortcut
-- `DELETE /api/admin/users/:userId/shortcuts/:id` - Delete user's shortcut
-- `GET /api/admin/shortcuts` - Get all shortcuts
-- `DELETE /api/admin/shortcuts/:id` - Delete shortcut
-- `GET /api/admin/settings` - Get site settings
-- `PUT /api/admin/settings` - Update site settings
-
-### Public Endpoints
-- `GET /s/:shortCode` - Redirect to original URL (increments clicks)
-- `GET /api/settings` - Get site settings (for branding)
-- `POST /api/contact` - Send contact form email (rate limited, reCAPTCHA protected)
-
-## Project Structure
-
-```
-shortcuts-app/
-├── src/                      # Backend source code
-│   ├── config/              # Configuration files
-│   │   ├── database.ts      # MongoDB connection setup
-│   │   └── passport.ts      # Passport.js & Google OAuth config
-│   ├── middleware/          # Express middleware
-│   │   ├── auth.ts          # JWT authentication middleware
-│   │   └── recaptcha.ts     # reCAPTCHA verification middleware
-│   ├── models/              # Mongoose models
-│   │   ├── User.ts          # User schema with roles & OAuth
-│   │   ├── Shortcut.ts      # Shortcut schema with analytics
-│   │   └── Settings.ts      # Site settings schema
-│   ├── routes/              # API route handlers
-│   │   ├── auth.ts          # Authentication routes (JWT + Google OAuth)
-│   │   ├── password-reset.ts # Password reset routes
-│   │   ├── user.ts          # User management routes
-│   │   ├── shortcuts.ts     # Shortcut CRUD with duplicate validation
-│   │   ├── admin.ts         # Admin panel operations
-│   │   └── contact.ts       # Contact form email handler
-│   └── server.ts            # Express server & middleware setup
-├── client/                  # Frontend React app
-│   ├── src/
-│   │   ├── components/      # Reusable components
-│   │   │   ├── Navbar.tsx               # Navigation with theme toggle
-│   │   │   ├── Footer.tsx               # Footer with page links
-│   │   │   ├── ChangePasswordModal.tsx  # User password change
-│   │   │   └── AdminChangePasswordModal.tsx # Admin password change
-│   │   ├── context/         # React context providers
-│   │   │   ├── AuthContext.tsx      # Authentication state
-│   │   │   ├── ThemeContext.tsx     # Dark/light theme
-│   │   │   └── SettingsContext.tsx  # Site settings
-│   │   ├── lib/             # Utility functions
-│   │   │   └── axios.ts     # Axios instance with interceptors
-│   │   ├── pages/           # Page components
-│   │   │   ├── Login.tsx               # Login with Google OAuth
-│   │   │   ├── Register.tsx            # Registration with reCAPTCHA
-│   │   │   ├── ForgotPassword.tsx      # Password reset request
-│   │   │   ├── Dashboard.tsx           # User dashboard (responsive)
-│   │   │   ├── Contact.tsx             # Contact form with reCAPTCHA
-│   │   │   ├── About.tsx               # About us page
-│   │   │   ├── PrivacyPolicy.tsx       # Privacy policy
-│   │   │   ├── Terms.tsx               # Terms of service
-│   │   │   └── admin/
-│   │   │       ├── AdminDashboard.tsx  # Admin stats & analytics
-│   │   │       ├── AdminManage.tsx     # User & URL management (responsive)
-│   │   │       └── AdminSettings.tsx   # Site settings editor
-│   │   ├── App.tsx          # Main app with routing
-│   │   ├── main.tsx         # Entry point
-│   │   └── index.css        # Global styles & Tailwind
-│   ├── .env                 # Frontend environment variables
-│   └── package.json
-├── .env                     # Backend environment variables
-├── GOOGLE_OAUTH_SETUP.md    # Google OAuth setup guide
-├── RECAPTCHA_SETUP.md       # reCAPTCHA setup guide
-├── MIGRATION.md             # Database migration guide
-├── tsconfig.json            # TypeScript configuration
-└── package.json             # Backend dependencies
-```
-
-## Security Features Details
-
-### Rate Limiting
-**Authentication Endpoints** (`/api/auth/login`, `/api/auth/register`):
-- 5 failed attempts per IP per 15 minutes
-- Smart counting: successful logins don't count toward limit
-- Automatic reset after time window
-- Protects against brute force password attacks
-
-**Password Reset** (`/api/password-reset/*`):
-- 5 requests per IP per 15 minutes
-- Prevents password reset abuse
-- Secure token generation with crypto
-
-**Contact Form** (`/api/contact`):
-- 5 submissions per IP per 15 minutes
-- Prevents spam and abuse
-- reCAPTCHA verification required
-
-### Password Security
-- Passwords hashed using bcryptjs with salt rounds (10)
-- Minimum 6 character requirement
-- Never stored in plain text
-- Secure comparison using bcrypt.compare()
-- Password reset tokens hashed before storage
-- Tokens expire after 1 hour
-
-### JWT Tokens
-- Signed with secret key from environment
-- Configurable expiration time (default: 24 hours via USER_TIMEOUT)
-- Stored in HTTP-only cookies
-- Validated on each protected request
-- Automatic token refresh on activity
-
-### Input Validation
-- Email format validation with regex
-- Email uniqueness check on registration
-- Username length validation (min 3 characters)
-- Username uniqueness check on registration
-- URL format validation for shortcuts (http/https required)
-- Short code pattern validation (alphanumeric + hyphens/underscores)
-- Duplicate URL prevention (case-insensitive)
-- Duplicate short code prevention
-- Sanitization of user inputs
-- reCAPTCHA verification on sensitive forms
-
-### reCAPTCHA Protection
-- Google reCAPTCHA v2 ("I'm not a robot" checkbox)
-- Protects registration and contact forms
-- Server-side verification
-- Configurable via environment variables
-- Gracefully degrades if not configured
-
-### Google OAuth 2.0
-- Secure authentication via Google accounts
-- Automatic user creation for new Google users
-- Links existing accounts by email
-- No password required for OAuth users
-- Secure token handling with Passport.js
-
-## Mobile Responsiveness
-
-### User Dashboard
-- Fully responsive card-based layout
-- Optimized for screens down to 370px width
-- Touch-friendly buttons and controls
-- Adaptive spacing and font sizes
-- Smooth animations and transitions
-
-### Admin Panel
-- **Users Tab**: Responsive card view for mobile
-  - Compact user information cards
-  - Touch-friendly action buttons
-  - Grid layout for actions (4 columns)
-  - Truncated text for long emails
-  - Status badges and role indicators
-
-- **Shortcuts Tab**: Responsive card view for mobile
-  - Short code with click counter
-  - URL in contained box with line clamping
-  - Owner information with avatar
-  - Delete action button
-  - Compact, space-efficient design
-
-- **Mobile Breakpoints**:
-  - < 1024px (lg): Card view
-  - ≥ 1024px (lg): Table view
-  - Tested on 370px - 400px devices
-  - Optimized for iPhone SE and similar
-
-## Email Configuration
-
-The application uses Nodemailer with SMTP for:
-1. Contact form submissions
-2. Password reset emails
-
-### Yandex Mail
+### Backend (.env)
 ```env
+# Database
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/
+MONGODB_DB_NAME=shortcuts
+
+# Security
+JWT_SECRET=your-super-secret-jwt-key-min-32-characters
+SESSION_SECRET=your-session-secret-key-min-32-characters
+
+# Server
+PORT=5000
+CLIENT_URL=http://localhost:5173
+NODE_ENV=development
+
+# Application
+MAX_SHORTCUT=10        # Maximum shortcuts per user
+USER_TIMEOUT=1440      # Session timeout in minutes (24 hours)
+
+# Email (SMTP)
 SMTP_HOST=smtp.yandex.com
 SMTP_PORT=587
 SMTP_USER=your-email@yandex.com
 SMTP_PASS=your-app-password
+RECIPIENT_EMAIL=admin@example.com
+
+# Google OAuth (Optional)
+GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-client-secret
+GOOGLE_CALLBACK_URL=http://localhost:5000/api/auth/google/callback
+
+# reCAPTCHA (Optional)
+RECAPTCHA_SECRET_KEY=your-recaptcha-secret-key
 ```
 
-### Gmail
+### Frontend (client/.env)
+```env
+VITE_API_URL=http://localhost:5000
+VITE_RECAPTCHA_SITE_KEY=your-recaptcha-site-key
+```
+
+### Email Providers
+
+**Yandex Mail** (Recommended):
+```env
+SMTP_HOST=smtp.yandex.com
+SMTP_PORT=587
+```
+
+**Gmail**:
 ```env
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
-SMTP_USER=your-email@gmail.com
-SMTP_PASS=your-app-password  # Use App Password, not account password
+# Note: Use App Password, not account password
 ```
 
-### Outlook/Hotmail
+**Outlook/Hotmail**:
 ```env
 SMTP_HOST=smtp-mail.outlook.com
 SMTP_PORT=587
-SMTP_USER=your-email@outlook.com
-SMTP_PASS=your-password
 ```
 
-**Note:** Enable "Less secure app access" or use app-specific passwords for Gmail/Outlook.
+## 📖 Usage
 
-## Development
+### For Users
+
+1. **Register/Login**
+   - Traditional: Email, username, password (with reCAPTCHA)
+   - Google OAuth: One-click sign-in
+   - Forgot password: Email-based recovery
+
+2. **Create Shortcuts**
+   - Click "New Shortcut"
+   - Enter URL (http:// or https://)
+   - Choose: Auto-generate or Custom code
+   - System validates duplicates in real-time
+   - Copy and share your short link
+
+3. **Manage Shortcuts**
+   - View all shortcuts on dashboard
+   - Edit URL or short code
+   - Delete unwanted shortcuts
+   - Track clicks and dates
+   - Copy links to clipboard
+
+4. **Access Short URLs**
+   - Format: `http://localhost:5000/s/YOUR_CODE`
+   - Automatic redirect to original URL
+   - Click counting and analytics
+
+### For Admins
+
+1. **Access Admin Panel**
+   - Login with admin account
+   - Click "Admin" in navigation
+   - View dashboard statistics
+
+2. **Manage Users**
+   - Search and sort users
+   - Edit user details
+   - Change roles and passwords
+   - Delete users
+   - View user shortcuts
+
+3. **Manage URLs**
+   - View all shortcuts
+   - Search and filter
+   - Delete shortcuts
+   - View analytics
+
+4. **Configure Settings**
+   - Update site branding
+   - Set SEO metadata
+   - Apply changes instantly
+
+## 🔌 API Endpoints
+
+### Authentication
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - Login user
+- `POST /api/auth/logout` - Logout user
+- `GET /api/auth/me` - Get current user
+- `GET /api/auth/google` - Google OAuth
+- `GET /api/auth/google/callback` - OAuth callback
+
+### Password Management
+- `POST /api/password-reset/request` - Request reset
+- `POST /api/password-reset/reset` - Reset password
+- `POST /api/password-reset/validate-token` - Validate token
+- `PUT /api/user/change-password` - Change password
+
+### Shortcuts (Protected)
+- `GET /api/shortcuts` - Get user shortcuts
+- `POST /api/shortcuts` - Create shortcut
+- `PUT /api/shortcuts/:id` - Update shortcut
+- `DELETE /api/shortcuts/:id` - Delete shortcut
+
+### Admin (Admin Only)
+- `GET /api/admin/stats` - Dashboard statistics
+- `GET /api/admin/users` - All users
+- `PUT /api/admin/users/:id` - Update user
+- `PUT /api/admin/users/:id/role` - Update role
+- `PUT /api/admin/users/:id/verify` - Toggle verification
+- `PUT /api/admin/users/:id/change-password` - Change password
+- `DELETE /api/admin/users/:id` - Delete user
+- `GET /api/admin/users/:userId/shortcuts` - User shortcuts
+- `POST /api/admin/users/:userId/shortcuts` - Create for user
+- `PUT /api/admin/users/:userId/shortcuts/:id` - Update user shortcut
+- `DELETE /api/admin/users/:userId/shortcuts/:id` - Delete user shortcut
+- `GET /api/admin/shortcuts` - All shortcuts
+- `DELETE /api/admin/shortcuts/:id` - Delete shortcut
+- `GET /api/admin/settings` - Get settings
+- `PUT /api/admin/settings` - Update settings
+
+### Public
+- `GET /s/:shortCode` - Redirect to URL
+- `GET /api/settings` - Public settings
+- `GET /api/health` - Health check
+- `GET /api/status` - API status
+- `POST /api/contact` - Contact form
+
+## 📁 Project Structure
+
+```
+shortcuts-app/
+├── src/                          # Backend source code
+│   ├── config/
+│   │   ├── database.ts          # MongoDB connection
+│   │   └── passport.ts          # Passport & OAuth config
+│   ├── middleware/
+│   │   ├── auth.ts              # JWT authentication
+│   │   └── recaptcha.ts         # reCAPTCHA verification
+│   ├── models/
+│   │   ├── User.ts              # User schema
+│   │   ├── Shortcut.ts          # Shortcut schema
+│   │   └── Settings.ts          # Settings schema
+│   ├── routes/
+│   │   ├── auth.ts              # Authentication routes
+│   │   ├── password-reset.ts    # Password reset
+│   │   ├── user.ts              # User management
+│   │   ├── shortcuts.ts         # Shortcut CRUD
+│   │   ├── admin.ts             # Admin operations
+│   │   ├── contact.ts           # Contact form
+│   │   └── api-docs.ts          # API documentation
+│   └── server.ts                # Express server
+├── client/                       # Frontend React app
+│   ├── src/
+│   │   ├── components/          # Reusable components
+│   │   │   ├── Navbar.tsx
+│   │   │   ├── Footer.tsx
+│   │   │   ├── ChangePasswordModal.tsx
+│   │   │   └── AdminChangePasswordModal.tsx
+│   │   ├── context/             # React contexts
+│   │   │   ├── AuthContext.tsx
+│   │   │   ├── ThemeContext.tsx
+│   │   │   └── SettingsContext.tsx
+│   │   ├── lib/
+│   │   │   └── axios.ts         # Axios instance
+│   │   ├── pages/               # Page components
+│   │   │   ├── Login.tsx
+│   │   │   ├── Register.tsx
+│   │   │   ├── ForgotPassword.tsx
+│   │   │   ├── Dashboard.tsx
+│   │   │   ├── Contact.tsx
+│   │   │   └── admin/
+│   │   │       ├── AdminDashboard.tsx
+│   │   │       ├── AdminManage.tsx
+│   │   │       └── AdminSettings.tsx
+│   │   ├── App.tsx
+│   │   └── main.tsx
+│   └── public/                  # Static files
+├── public/
+│   └── api-docs.html           # API documentation page
+├── .env                         # Backend environment (NOT in git)
+├── .env.example                # Backend env template
+├── client/.env                 # Frontend environment (NOT in git)
+├── client/.env.example         # Frontend env template
+└── Documentation files (*.md)
+```
+
+## 🛡️ Security Features
+
+### Authentication
+- ✅ bcrypt password hashing (10 rounds)
+- ✅ JWT with HTTP-only cookies
+- ✅ Google OAuth 2.0
+- ✅ Session management
+- ✅ Role-based access control
+
+### Protection
+- ✅ Rate limiting (all endpoints)
+- ✅ reCAPTCHA v2 bot protection
+- ✅ MongoDB injection prevention
+- ✅ XSS protection
+- ✅ CSRF protection
+- ✅ HTTP parameter pollution prevention
+- ✅ Security headers (Helmet)
+- ✅ CORS whitelist
+
+### Data Security
+- ✅ Input validation (express-validator)
+- ✅ Schema validation (Mongoose)
+- ✅ Secure token generation
+- ✅ Password reset with expiry
+- ✅ Email verification
+
+See [SECURITY.md](SECURITY.md) for detailed security documentation.
+
+## 🚀 Deployment
+
+### Production Checklist
+- [ ] Update all environment variables
+- [ ] Change JWT_SECRET and SESSION_SECRET
+- [ ] Set NODE_ENV=production
+- [ ] Enable HTTPS (secure cookies)
+- [ ] Update CORS origins
+- [ ] Update Google OAuth URLs
+- [ ] Update reCAPTCHA domains
+- [ ] Configure MongoDB IP whitelist
+- [ ] Set up monitoring
+- [ ] Enable database backups
+
+See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for complete deployment instructions.
+
+### Build Commands
+```bash
+# Backend
+npm run build
+
+# Frontend
+cd client && npm run build
+```
+
+## 🔧 Development
 
 ### Available Scripts
 
 **Backend:**
-- `npm run dev` - Start backend with nodemon (auto-restart on changes)
-- `npm run server` - Start backend development server
-- `npm run build` - Build TypeScript to JavaScript
-- `npm start` - Start production server
-
-**Frontend:**
-- `npm run client` - Start Vite development server
-- `cd client && npm run dev` - Alternative way to start frontend
-- `cd client && npm run build` - Build frontend for production
-- `cd client && npm run preview` - Preview production build
-
-### Debugging Tips
-
-**Backend Issues:**
-- Check MongoDB connection in console logs
-- Verify environment variables are loaded
-- Check API responses in terminal
-- Enable debug mode with `NODE_ENV=development`
-- Check Passport.js Google OAuth configuration
-
-**Frontend Issues:**
-- Check browser console for errors
-- Verify API URL in `client/.env`
-- Check network tab for API calls
-- Clear browser cache and localStorage
-- Verify reCAPTCHA keys are correct
-
-**Email Issues:**
-- Verify SMTP credentials
-- Check spam folder for test emails
-- Test with simple SMTP testing tools
-- Enable "Allow less secure apps" for Gmail
-- Check password reset token expiration
-
-**OAuth Issues:**
-- Verify Google OAuth credentials
-- Check authorized redirect URIs
-- Ensure OAuth consent screen is configured
-- Check browser console for OAuth errors
-
-**reCAPTCHA Issues:**
-- Verify site and secret keys match
-- Check domain whitelist in reCAPTCHA console
-- Test with localhost domains enabled
-- Check browser console for reCAPTCHA errors
-
-## Production Deployment
-
-### Security Best Practices
-
-⚠️ **CRITICAL SECURITY REMINDERS**:
-
-1. **Never commit sensitive data**:
-   - `.env` files are excluded via `.gitignore`
-   - Use `.env.example` files as templates
-   - Never hardcode credentials in source code
-   - Review all commits before pushing
-
-2. **Credential Management**:
-   - Use strong, unique secrets for production
-   - Rotate credentials periodically
-   - Use environment variable management tools
-   - Keep production and development credentials separate
-
-3. **Repository Security**:
-   - The `.gitignore` already protects `.env` files
-   - `.env.example` files contain no actual credentials
-   - Review `.git` history if migrating from other repos
-   - Use GitHub's secret scanning if available
-
-### 1. Environment Setup
-```env
-NODE_ENV=production
-JWT_SECRET=generate-strong-secret-key-here
-MONGODB_URI=your-production-mongodb-uri
-CLIENT_URL=https://your-domain.com
-
-# Google OAuth (Production)
-GOOGLE_CLIENT_ID=your-production-client-id
-GOOGLE_CLIENT_SECRET=your-production-client-secret
-GOOGLE_CALLBACK_URL=https://your-domain.com/api/auth/google/callback
-SESSION_SECRET=your-production-session-secret
-
-# reCAPTCHA (Production)
-RECAPTCHA_SECRET_KEY=your-production-recaptcha-secret
-VITE_RECAPTCHA_SITE_KEY=your-production-recaptcha-site-key
-```
-
-### 2. Build Application
 ```bash
-# Build backend
-npm run build
-
-# Build frontend
-cd client && npm run build
+npm run dev      # Development with nodemon
+npm run build    # Build TypeScript
+npm start        # Production server
 ```
 
-### 3. Deployment Options
-
-**Backend (API):**
-- Railway: Git-based deployment with MongoDB plugin
-- Heroku: Easy deployment with Heroku CLI + MongoDB Atlas
-- DigitalOcean: VPS with PM2 process manager
-- AWS EC2: Full control with Docker containers
-
 **Frontend:**
-- Vercel: Automatic deployments from Git
-- Netlify: CI/CD with GitHub integration
-- Cloudflare Pages: Fast CDN distribution
-- Traditional hosting: Build and upload dist/ folder
+```bash
+npm run dev      # Vite dev server
+npm run build    # Production build
+npm run preview  # Preview build
+```
 
-### 4. Production Checklist
+### Testing
+- Manual testing via API documentation page
+- Frontend testing in browser
+- Check console logs for errors
+- Test mobile responsive design
 
-**Security:**
-- ✅ No `.env` files committed to repository
-- ✅ All credentials stored as environment variables
-- ✅ Strong JWT secret generated (min 32 characters)
-- ✅ Strong session secret generated
-- ✅ Production secrets different from development
-- ✅ `.gitignore` properly configured
-- ✅ Reviewed git history for exposed secrets
-- ✅ HTTPS enabled (SSL certificate)
-- ✅ Security headers configured (helmet.js)
-
-**Configuration:**
-- ✅ MongoDB production database configured
-- ✅ CORS origins set to production domain
-- ✅ SMTP credentials for production email
-- ✅ Google OAuth production credentials configured
-- ✅ Google OAuth authorized redirect URIs updated
-- ✅ reCAPTCHA production keys configured
-- ✅ reCAPTCHA domain whitelist updated
-- ✅ Environment variables set on hosting platform
-- ✅ Rate limiting configured appropriately
-- ✅ Password reset token expiration configured
-- ✅ File upload limits set
-
-**Monitoring:**
-- ✅ Error logging and monitoring setup
-- ✅ Database backups configured
-- ✅ CDN for static assets (optional)
-
-## Troubleshooting
+## 🐛 Troubleshooting
 
 ### Common Issues
 
-**"Cannot connect to MongoDB"**
-- Check MongoDB URI is correct
-- Verify IP whitelist in MongoDB Atlas
-- Ensure database user has proper permissions
-- Check network connectivity
+**MongoDB Connection Error**
+- Verify MongoDB URI
+- Check IP whitelist in Atlas
+- Ensure database user has permissions
 
-**"CORS error"**
+**CORS Error**
 - Verify CLIENT_URL in backend .env
-- Check frontend is running on correct port
-- Ensure both origins are allowed in CORS config
-- Check for trailing slashes in URLs
+- Check VITE_API_URL in frontend .env
+- Ensure both servers are running
 
-**"Rate limit exceeded"**
-- Wait 15 minutes for limit to reset
-- Check if you're using correct credentials
-- Verify IP address isn't blocked
-- Use different browser/incognito mode for testing
-
-**"Email not sending"**
+**Email Not Sending**
 - Verify SMTP credentials
-- Check SMTP server allows connections
-- Enable "Less secure apps" for Gmail
-- Use app-specific password
 - Check spam folder
-- Verify SMTP_PORT is correct
+- Enable "Less secure apps" (Gmail)
+- Use app-specific password
 
-**"Google OAuth not working"**
-- Verify Google OAuth credentials are correct
-- Check authorized redirect URIs match exactly
+**OAuth Not Working**
+- Verify Google credentials
+- Check authorized redirect URIs
+- Clear browser cookies
 - Ensure OAuth consent screen is configured
-- Check CLIENT_URL matches OAuth settings
-- Clear browser cookies and try again
 
-**"reCAPTCHA not showing"**
-- Verify reCAPTCHA site key is correct
-- Check domain is whitelisted in reCAPTCHA console
-- Enable localhost in reCAPTCHA settings for development
-- Check browser console for errors
-- Ensure reCAPTCHA script is loaded
+**reCAPTCHA Issues**
+- Verify site and secret keys match
+- Check domain whitelist
+- Enable localhost in development
+- Check browser console
 
-**"Password reset not working"**
-- Check SMTP email configuration
-- Verify token hasn't expired (1 hour limit)
-- Check spam folder for reset email
-- Ensure CLIENT_URL is correct in reset link
-- Check database for reset token
+See full troubleshooting guide in [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md).
 
-**"Duplicate short code error"**
-- This is expected behavior - code is already taken
-- Try a different custom code
-- Or use auto-generation instead
-- System retries auto-generation up to 5 times
+## 📈 Performance
 
-## Migration Guide
+- Response compression enabled
+- Rate limiting prevents abuse
+- MongoDB indexing on frequently queried fields
+- Optimized image loading
+- Lazy loading for components
+- Efficient re-rendering with React
 
-If you're upgrading from an older version, see [MIGRATION.md](MIGRATION.md) for:
-- Database schema changes
-- New environment variables
-- Breaking changes
-- Migration scripts
+## 🔄 Updates & Maintenance
 
-## Contributing
+### Regular Tasks
+- Update dependencies monthly
+- Rotate credentials quarterly
+- Review security logs
+- Backup database regularly
+- Monitor API usage
+- Test authentication flows
 
-Contributions are welcome! Please follow these steps:
+See [SECURITY_ROTATION_GUIDE.md](SECURITY_ROTATION_GUIDE.md) for credential rotation procedures.
 
+## 🤝 Contributing
+
+Contributions welcome! Please:
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+2. Create feature branch
+3. Commit changes
+4. Push to branch
+5. Open Pull Request
 
 ### Development Guidelines
-- Write TypeScript with proper types
+- Use TypeScript with proper types
 - Follow existing code style
 - Add comments for complex logic
-- Test on both desktop and mobile
-- Update README for new features
+- Test on desktop and mobile
+- Update documentation
 - Check for console errors
 
-## License
+## 📄 License
 
 ISC
 
-## Author
+## 👨‍💻 Author
 
 Shortcuts Team
 
-## Support
+## 📞 Support
 
-For issues and questions, please:
-- Open an issue on GitHub
-- Use the contact form in the application
-- Email: sedatergoz@gmail.com
+- **Email**: sedatergoz@gmail.com
+- **GitHub Issues**: [Report bugs](https://github.com/eaeoz/shortcuts-app/issues)
+- **Contact Form**: Available in application
 
-## Changelog
+## 🔐 Security
 
-### Version 2.0.0 (Latest)
-- ✨ Added Google OAuth 2.0 authentication
-- 🤖 Added reCAPTCHA v2 bot protection
-- 🔑 Added forgot password functionality
-- 🔒 Added user password change feature
-- 🔐 Added admin password change feature
-- 🔄 Added duplicate URL/code validation
-- 📱 Made admin panel fully responsive (370px+)
-- 👥 Added user shortcuts management modal
-- ✏️ Added edit user functionality for admins
-- 🚀 Improved error handling and user feedback
-- 🎨 Enhanced UI/UX with better animations
-- 📊 Added real-time validation indicators
+For security vulnerabilities, email: sedatergoz@gmail.com
+
+**DO NOT** open public issues for security concerns.
+
+## 📝 Changelog
+
+### Version 2.1.0 (Latest)
+- ✨ Added API health check and status endpoints
+- 🔧 Fixed Content Security Policy for inline handlers
+- 📚 Updated comprehensive documentation
+- 🔗 Added interactive API documentation page
+- 📊 Added system information in health checks
+
+### Version 2.0.0
+- ✨ Google OAuth 2.0 authentication
+- 🤖 reCAPTCHA v2 bot protection
+- 🔑 Forgot password functionality
+- 🔒 Password change features
+- 🔄 Duplicate validation
+- 📱 Mobile responsive admin panel
+- 👥 User shortcuts management
+- ✏️ Admin user editing
+- 🚀 Enhanced error handling
 
 ### Version 1.0.0
 - Initial release with core features
 - JWT authentication
-- URL shortening with custom codes
-- Admin dashboard with statistics
+- URL shortening
+- Admin dashboard
 - Contact form
-- Dark/light theme toggle
+- Dark/light theme
 - Rate limiting
 - Responsive design
 
-## Acknowledgments
+## 🙏 Acknowledgments
 
-- Built with modern React 18 and Node.js
-- Authentication powered by Passport.js
-- UI inspired by modern design principles
-- Icons by Lucide React
-- Charts by Recharts
-- Styling with Tailwind CSS
-- Bot protection by Google reCAPTCHA
-- OAuth by Google Identity Platform
+- React 18 and Node.js communities
+- Passport.js for authentication
+- Tailwind CSS for styling
+- Lucide React for icons
+- Recharts for data visualization
+- Google for OAuth and reCAPTCHA
+- MongoDB Atlas for database hosting
+
+## 📚 Additional Resources
+
+- [Node.js Security Best Practices](https://nodejs.org/en/docs/guides/security/)
+- [Express Security](https://expressjs.com/en/advanced/best-practice-security.html)
+- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
+- [MongoDB Security](https://docs.mongodb.com/manual/administration/security-checklist/)
+- [React Best Practices](https://react.dev/learn)
+
+---
+
+**Last Updated**: December 2, 2025  
+**Status**: ✅ Production Ready  
+**Version**: 2.1.0
