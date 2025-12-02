@@ -12,7 +12,6 @@ interface Shortcut {
 }
 
 const Dashboard: React.FC = () => {
-  const { user } = useAuth();
   const [shortcuts, setShortcuts] = useState<Shortcut[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -42,6 +41,17 @@ const Dashboard: React.FC = () => {
     e.preventDefault();
     setError('');
     setSuccess('');
+
+    // Client-side validation: Check if URL already has a shortcut
+    const normalizedUrl = originalUrl.trim().toLowerCase();
+    const urlExists = shortcuts.find(s => 
+      s.originalUrl.toLowerCase() === normalizedUrl && s._id !== editingId
+    );
+    
+    if (urlExists) {
+      setError(`This URL already has a shortcut: /s/${urlExists.shortCode}`);
+      return;
+    }
 
     // Client-side validation: Check if custom short code already exists
     if (shortCode) {
@@ -214,11 +224,45 @@ const Dashboard: React.FC = () => {
                   <input
                     type="url"
                     value={originalUrl}
-                    onChange={(e) => setOriginalUrl(e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setOriginalUrl(value);
+                      
+                      // Real-time duplicate URL check
+                      if (value.trim()) {
+                        const normalizedUrl = value.trim().toLowerCase();
+                        const urlExists = shortcuts.find(s => 
+                          s.originalUrl.toLowerCase() === normalizedUrl && s._id !== editingId
+                        );
+                        if (urlExists) {
+                          setError(`This URL already has a shortcut: /s/${urlExists.shortCode}`);
+                        } else if (!shortCode || shortCode.trim().length < 4) {
+                          setError('');
+                        }
+                      }
+                    }}
                     required
-                    className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-all"
+                    className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-indigo-500/20 dark:bg-gray-700 dark:text-white transition-all ${
+                      originalUrl.trim() && shortcuts.find(s => 
+                        s.originalUrl.toLowerCase() === originalUrl.trim().toLowerCase() && s._id !== editingId
+                      )
+                        ? 'border-red-500 dark:border-red-500 focus:border-red-500'
+                        : 'border-gray-300 dark:border-gray-600 focus:border-indigo-500'
+                    }`}
                     placeholder="https://example.com/very-long-url"
                   />
+                  {originalUrl.trim() && shortcuts.find(s => 
+                    s.originalUrl.toLowerCase() === originalUrl.trim().toLowerCase() && s._id !== editingId
+                  ) && (
+                    <p className="text-sm text-red-600 dark:text-red-400 mt-2 flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4" />
+                      <span>
+                        This URL already has a shortcut: <code className="font-mono font-bold">/s/{shortcuts.find(s => 
+                          s.originalUrl.toLowerCase() === originalUrl.trim().toLowerCase() && s._id !== editingId
+                        )?.shortCode}</code>
+                      </span>
+                    </p>
+                  )}
                 </div>
 
                 <div>
