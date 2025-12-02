@@ -33,10 +33,16 @@ Your backend is already configured for production. The `src/server.ts` uses envi
 3. **Configure Build Settings**:
    - **Builder**: Buildpack (Node.js)
    - **Work directory**: `/` (root directory - leave empty or set to `/`)
-   - **Build command**: `npm install && npm run build`
+   - **Build command**: `npm run build`
    - **Run command**: `npm start`
    - **Port**: `5000`
    - **Instance type**: Select appropriate size (Free tier or Nano for testing)
+   
+   **Note**: The build script automatically:
+   - Installs root dependencies (Koyeb does this)
+   - Compiles TypeScript (`tsc`)
+   - Installs client dependencies (`cd client && npm install`)
+   - Builds React app (`npm run build`)
 
 4. **Set Environment Variables**:
    
@@ -162,6 +168,7 @@ Your backend is already configured for production. The `src/server.ts` uses envi
    - Base directory: `client`
    - Build command: `npm run build`
    - Publish directory: `client/dist`
+   - **Node version**: 20 (set in netlify.toml)
 
 4. **Set Environment Variables**:
    - Go to Site settings → Environment variables
@@ -262,7 +269,7 @@ Redeploy the backend for changes to take effect.
 ### Issue: npm start Not Starting App
 
 **Solution**:
-1. Ensure build command is: `npm install && npm run build`
+1. Ensure build command is: `npm run build`
 2. This compiles TypeScript to `dist/` folder
 3. The start command `npm start` runs `node dist/server.js`
 4. Check Koyeb logs for build errors
@@ -271,10 +278,29 @@ Redeploy the backend for changes to take effect.
 ### Issue: "Cannot find module dist/server.js"
 
 **Solution**:
-1. Build command must include `npm run build`
-2. Full build command: `npm install && npm run build`
-3. This creates the `dist/` folder with compiled JavaScript
+1. Build command must be `npm run build` (not just `npm install`)
+2. Koyeb automatically runs `npm install` first
+3. Then runs your build command which creates the `dist/` folder
 4. Work directory should be `/` (root)
+
+### Issue: Build fails with exit code 51
+
+**Solution**:
+1. Koyeb runs `npm install` automatically first
+2. Then runs your build command: `npm run build`
+3. The build script:
+   - Compiles backend: `tsc` → creates `dist/`
+   - Installs client deps: `cd client && npm install`
+   - Builds frontend: `npm run build`
+4. If it fails, check that:
+   - `engines` field specifies Node.js version
+   - All dependencies are in package.json
+   - TypeScript compiles without errors locally
+
+### Issue: Client dependencies not found during build
+
+**Solution**:
+The build script now includes `cd client && npm install && npm run build` to ensure client dependencies are installed during the build process.
 
 ### Issue: API Not Connecting
 
@@ -303,6 +329,16 @@ Redeploy the backend for changes to take effect.
 1. Verify SMTP credentials are correct and rotated
 2. Check Koyeb logs for SMTP errors
 3. Ensure Yandex allows app password access
+
+### Issue: Netlify build fails with "Vite requires Node.js version 20.19+"
+
+**Solution**:
+The `client/netlify.toml` file specifies Node.js version 20:
+```toml
+[build.environment]
+  NODE_VERSION = "20"
+```
+If you see this error, ensure the netlify.toml file has been pushed to your repository.
 
 ---
 

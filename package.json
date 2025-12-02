@@ -3,9 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/server.js",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
   "scripts": {
     "dev": "nodemon --exec ts-node src/server.ts",
-    "build": "tsc && cd client && npm run build",
+    "build": "tsc && cd client && npm install && npm run build",
     "start": "node dist/server.js",
     "client": "cd client && npm run dev",
     "server": "nodemon --exec ts-node src/server.ts",
