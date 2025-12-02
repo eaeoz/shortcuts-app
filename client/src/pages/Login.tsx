@@ -199,7 +199,7 @@ const Login: React.FC = () => {
 
             {/* Google Sign In Button */}
             <a
-              href="http://localhost:5000/api/auth/google"
+              href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/google`}
               className="w-full inline-flex items-center justify-center gap-3 px-6 py-3 sm:py-3.5 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-semibold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 shadow-md hover:shadow-lg text-sm sm:text-base"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
