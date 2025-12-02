@@ -24,6 +24,12 @@ dotenv.config();
 
 const app = express();
 
+// Trust proxy - required for Koyeb/production deployment
+// This allows express-rate-limit to correctly identify users behind proxies
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 // Rate limiter for general public endpoints
 const publicApiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
