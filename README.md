@@ -7,7 +7,8 @@ A modern, full-stack URL shortener application with user authentication, admin d
 | Document | Description |
 |----------|-------------|
 | [SECURITY.md](SECURITY.md) | Comprehensive security implementation guide |
-| [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) | Complete deployment instructions |
+| [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) | Complete deployment instructions (Netlify + Zeabur) |
+| [ZEABUR_MIGRATION.md](ZEABUR_MIGRATION.md) | Migration guide from Koyeb to Zeabur |
 | [GOOGLE_OAUTH_SETUP.md](GOOGLE_OAUTH_SETUP.md) | Google OAuth 2.0 setup guide |
 | [RECAPTCHA_SETUP.md](RECAPTCHA_SETUP.md) | reCAPTCHA configuration guide |
 | [MIGRATION.md](MIGRATION.md) | Database migration guide |

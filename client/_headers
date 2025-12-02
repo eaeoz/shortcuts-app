@@ -17,7 +17,7 @@
   Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=()
   
   # Content Security Policy
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.koyeb.app http://localhost:5000; frame-src https://www.google.com;
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.zeabur.app http://localhost:5000; frame-src https://www.google.com;
   
   # Strict Transport Security (HSTS)
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
