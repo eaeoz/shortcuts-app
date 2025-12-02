@@ -493,8 +493,16 @@ router.get(
       // Create JWT token
       const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: `${USER_TIMEOUT}ms` });
 
+      console.log('🍪 Google OAuth - Setting cookie for user:', user.email);
+      console.log('🍪 Token:', token.substring(0, 20) + '...');
+      console.log('🍪 Cookie settings:', getCookieSettings());
+
       // Set cookie
-      res.cookie('token', token, getCookieSettings());
+      const cookieSettings = getCookieSettings();
+      res.cookie('token', token, cookieSettings);
+      
+      console.log('🍪 Cookie header should be set');
+      console.log('🔄 Redirecting to:', `${process.env.CLIENT_URL}/dashboard`);
 
       // Redirect to dashboard
       res.redirect(`${process.env.CLIENT_URL}/dashboard`);
