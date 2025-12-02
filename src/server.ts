@@ -24,11 +24,10 @@ dotenv.config();
 
 const app = express();
 
-// Trust proxy - required for Koyeb/production deployment
+// Trust proxy - required for Koyeb/production deployment behind reverse proxy
 // This allows express-rate-limit to correctly identify users behind proxies
-if (process.env.NODE_ENV === 'production') {
-  app.set('trust proxy', 1);
-}
+// Enable when behind reverse proxy (Koyeb, Heroku, AWS, etc.)
+app.set('trust proxy', 1);
 
 // Rate limiter for general public endpoints
 const publicApiLimiter = rateLimit({
@@ -57,7 +56,15 @@ app.use(helmet({
     },
   },
   crossOriginEmbedderPolicy: false,
+  xssFilter: true, // Enable X-XSS-Protection header
 }));
+
+// Additional security headers
+app.use((req, res, next) => {
+  // X-XSS-Protection header for older browsers
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  next();
+});
 
 // 2. Prevent HTTP Parameter Pollution
 app.use(hpp());
