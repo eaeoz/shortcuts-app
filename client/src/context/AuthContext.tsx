@@ -11,7 +11,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, recaptchaToken?: string) => Promise<void>;
   register: (username: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   isAdmin: boolean;
@@ -46,8 +46,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkAuth();
   }, []);
 
-  const login = async (email: string, password: string) => {
-    const response = await axios.post('/api/auth/login', { email, password }, { withCredentials: true });
+  const login = async (email: string, password: string, recaptchaToken?: string) => {
+    const response = await axios.post('/api/auth/login', { email, password, recaptchaToken }, { withCredentials: true });
     setUser(response.data.user);
   };
 

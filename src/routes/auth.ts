@@ -6,6 +6,7 @@ import rateLimit from 'express-rate-limit';
 import nodemailer from 'nodemailer';
 import User from '../models/User';
 import { auth, AuthRequest } from '../middleware/auth';
+import { verifyRecaptchaLenient } from '../middleware/recaptcha';
 
 const router = express.Router();
 
@@ -44,6 +45,7 @@ const USER_TIMEOUT = parseInt(process.env.USER_TIMEOUT || '1440') * 60 * 1000; /
 // Send verification code for registration
 router.post(
   '/send-verification',
+  verifyRecaptchaLenient,
   authLimiter,
   [
     body('username').trim().isLength({ min: 3 }).withMessage('Username must be at least 3 characters'),
@@ -346,6 +348,7 @@ router.post(
 // Login (with rate limiting)
 router.post(
   '/login',
+  verifyRecaptchaLenient,
   authLimiter,
   [
     body('email').isEmail().withMessage('Please provide a valid email'),

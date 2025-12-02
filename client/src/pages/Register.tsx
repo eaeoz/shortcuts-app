@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { useTheme } from '../context/ThemeContext';
 import { UserPlus, Mail, Lock, User, AlertCircle, Moon, Sun, Key } from 'lucide-react';
 
@@ -14,6 +15,7 @@ const Register: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [attemptsRemaining, setAttemptsRemaining] = useState(4);
   const { theme, toggleTheme } = useTheme();
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
   const handleSendVerification = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,11 +34,20 @@ const Register: React.FC = () => {
     setLoading(true);
 
     try {
+      // Get reCAPTCHA token
+      if (!executeRecaptcha) {
+        setError('reCAPTCHA not ready. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      const recaptchaToken = await executeRecaptcha('register');
+
       const response = await fetch('http://localhost:5000/api/auth/send-verification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({ username, email, password, recaptchaToken }),
       });
 
       const data = await response.json();

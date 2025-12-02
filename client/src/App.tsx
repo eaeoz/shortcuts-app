@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { SettingsProvider } from './context/SettingsContext';
@@ -87,15 +88,19 @@ const AppContent: React.FC = () => {
 };
 
 const App: React.FC = () => {
+  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+
   return (
     <BrowserRouter>
-      <SettingsProvider>
-        <ThemeProvider>
-          <AuthProvider>
-            <AppContent />
-          </AuthProvider>
-        </ThemeProvider>
-      </SettingsProvider>
+      <GoogleReCaptchaProvider reCaptchaKey={recaptchaSiteKey}>
+        <SettingsProvider>
+          <ThemeProvider>
+            <AuthProvider>
+              <AppContent />
+            </AuthProvider>
+          </ThemeProvider>
+        </SettingsProvider>
+      </GoogleReCaptchaProvider>
     </BrowserRouter>
   );
 };

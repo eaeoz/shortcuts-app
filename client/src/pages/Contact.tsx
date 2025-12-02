@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle } from 'lucide-react';
 
 const Contact: React.FC = () => {
+  const { executeRecaptcha } = useGoogleReCaptcha();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -17,13 +19,22 @@ const Contact: React.FC = () => {
     setErrorMessage('');
 
     try {
+      // Get reCAPTCHA token
+      if (!executeRecaptcha) {
+        setStatus('error');
+        setErrorMessage('reCAPTCHA not ready. Please try again.');
+        return;
+      }
+
+      const recaptchaToken = await executeRecaptcha('contact');
+
       // Call the backend API endpoint
       const response = await fetch('http://localhost:5000/api/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, recaptchaToken }),
       });
 
       const data = await response.json();

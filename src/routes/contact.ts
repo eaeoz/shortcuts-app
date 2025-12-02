@@ -1,6 +1,7 @@
 import express from 'express';
 import nodemailer from 'nodemailer';
 import rateLimit from 'express-rate-limit';
+import { verifyRecaptchaLenient } from '../middleware/recaptcha';
 
 const router = express.Router();
 
@@ -15,8 +16,8 @@ const contactLimiter = rateLimit({
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 
-// Contact form endpoint (public - no auth required, but rate limited)
-router.post('/', contactLimiter, async (req, res) => {
+// Contact form endpoint (public - no auth required, but rate limited and reCAPTCHA protected)
+router.post('/', verifyRecaptchaLenient, contactLimiter, async (req, res) => {
   console.log('✅ Contact endpoint hit!');
   
   try {

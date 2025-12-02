@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { Mail, Lock, AlertCircle, Moon, Sun } from 'lucide-react';
@@ -11,6 +12,7 @@ const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { executeRecaptcha } = useGoogleReCaptcha();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -19,7 +21,16 @@ const Login: React.FC = () => {
     setLoading(true);
 
     try {
-      await login(email, password);
+      // Get reCAPTCHA token
+      if (!executeRecaptcha) {
+        setError('reCAPTCHA not ready. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      const recaptchaToken = await executeRecaptcha('login');
+
+      await login(email, password, recaptchaToken);
       navigate('/dashboard');
     } catch (err: any) {
       // Check if it's an unverified account error (403 status)
