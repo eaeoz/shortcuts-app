@@ -45,7 +45,14 @@ router.get('/stats', adminAuth, async (req: AuthRequest, res: Response) => {
 router.get('/users', adminAuth, async (req: AuthRequest, res: Response) => {
   try {
     const users = await User.find().select('-password').sort({ createdAt: -1 });
-    res.json({ users });
+    
+    // Ensure all users have isVerified field (backward compatibility)
+    const usersWithVerification = users.map(user => ({
+      ...user.toObject(),
+      isVerified: user.isVerified !== undefined ? user.isVerified : true
+    }));
+    
+    res.json({ users: usersWithVerification });
   } catch (error) {
     console.error('Get users error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -239,6 +246,158 @@ router.put('/settings', adminAuth, [
     res.json({ message: 'Settings updated successfully', settings });
   } catch (error) {
     console.error('Update settings error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Toggle user verification status
+router.put('/users/:id/verify', adminAuth, async (req: AuthRequest, res: Response) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    user.isVerified = !user.isVerified;
+    await user.save();
+
+    res.json({ 
+      message: `User ${user.isVerified ? 'verified' : 'unverified'} successfully`, 
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        isVerified: user.isVerified
+      }
+    });
+  } catch (error) {
+    console.error('Toggle verify error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Get user's shortcuts
+router.get('/users/:id/shortcuts', adminAuth, async (req: AuthRequest, res: Response) => {
+  try {
+    const shortcuts = await Shortcut.find({ userId: req.params.id })
+      .sort({ createdAt: -1 });
+    res.json({ shortcuts });
+  } catch (error) {
+    console.error('Get user shortcuts error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Create shortcut for user (admin)
+router.post('/users/:id/shortcuts', adminAuth, [
+  body('originalUrl').trim().notEmpty().withMessage('URL is required').isURL().withMessage('Invalid URL'),
+  body('shortCode').optional().trim().matches(/^[a-zA-Z0-9_-]{4,}$/).withMessage('Short code must be at least 4 characters and contain only letters, numbers, hyphens, and underscores')
+], async (req: AuthRequest, res: Response) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const { originalUrl, shortCode } = req.body;
+
+    // Generate short code if not provided
+    let finalShortCode = shortCode;
+    if (!finalShortCode) {
+      finalShortCode = Math.random().toString(36).substring(2, 8);
+      // Ensure uniqueness
+      while (await Shortcut.findOne({ shortCode: finalShortCode })) {
+        finalShortCode = Math.random().toString(36).substring(2, 8);
+      }
+    } else {
+      // Check if custom short code already exists
+      const existingShortcut = await Shortcut.findOne({ shortCode: finalShortCode });
+      if (existingShortcut) {
+        return res.status(400).json({ message: 'This short code is already taken' });
+      }
+    }
+
+    const shortcut = new Shortcut({
+      userId: user._id,
+      originalUrl,
+      shortCode: finalShortCode,
+      clicks: 0
+    });
+
+    await shortcut.save();
+
+    res.status(201).json({ message: 'Shortcut created successfully', shortcut });
+  } catch (error) {
+    console.error('Create shortcut error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Update user's shortcut (admin)
+router.put('/users/:userId/shortcuts/:shortcutId', adminAuth, [
+  body('originalUrl').optional().trim().isURL().withMessage('Invalid URL'),
+  body('shortCode').optional().trim().matches(/^[a-zA-Z0-9_-]{4,}$/).withMessage('Short code must be at least 4 characters and contain only letters, numbers, hyphens, and underscores')
+], async (req: AuthRequest, res: Response) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const shortcut = await Shortcut.findOne({ 
+      _id: req.params.shortcutId,
+      userId: req.params.userId 
+    });
+
+    if (!shortcut) {
+      return res.status(404).json({ message: 'Shortcut not found' });
+    }
+
+    const { originalUrl, shortCode } = req.body;
+
+    if (originalUrl) {
+      shortcut.originalUrl = originalUrl;
+    }
+
+    if (shortCode && shortCode !== shortcut.shortCode) {
+      // Check if new short code already exists
+      const existingShortcut = await Shortcut.findOne({ shortCode });
+      if (existingShortcut) {
+        return res.status(400).json({ message: 'This short code is already taken' });
+      }
+      shortcut.shortCode = shortCode;
+    }
+
+    await shortcut.save();
+
+    res.json({ message: 'Shortcut updated successfully', shortcut });
+  } catch (error) {
+    console.error('Update shortcut error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Delete user's shortcut (admin)
+router.delete('/users/:userId/shortcuts/:shortcutId', adminAuth, async (req: AuthRequest, res: Response) => {
+  try {
+    const shortcut = await Shortcut.findOneAndDelete({
+      _id: req.params.shortcutId,
+      userId: req.params.userId
+    });
+
+    if (!shortcut) {
+      return res.status(404).json({ message: 'Shortcut not found' });
+    }
+
+    res.json({ message: 'Shortcut deleted successfully' });
+  } catch (error) {
+    console.error('Delete shortcut error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });

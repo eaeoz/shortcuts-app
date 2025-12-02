@@ -242,7 +242,8 @@ router.post(
         username: verifyData.username,
         email: verifyData.email,
         password: verifyData.password, // Already hashed
-        role: 'user'
+        role: 'user',
+        isVerified: true
       });
 
       await user.save();
@@ -306,12 +307,13 @@ router.post(
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
 
-      // Create user
+      // Create user (backward compatibility - auto-verify)
       user = new User({
         username,
         email,
         password: hashedPassword,
-        role: 'user'
+        role: 'user',
+        isVerified: true
       });
 
       await user.save();
