@@ -12,12 +12,25 @@ import adminRoutes from './routes/admin';
 import contactRoutes from './routes/contact';
 import passwordResetRoutes from './routes/password-reset';
 import userRoutes from './routes/user';
+import apiDocsRoutes from './routes/api-docs';
 import Settings from './models/Settings';
 import Shortcut from './models/Shortcut';
+import rateLimit from 'express-rate-limit';
 
 dotenv.config();
 
 const app = express();
+
+// Rate limiter for general public endpoints
+const publicApiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: {
+    error: 'Too many requests from this IP, please try again after 15 minutes'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 const PORT = process.env.PORT || 5000;
 
 // Connect to database
@@ -59,9 +72,10 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/password-reset', passwordResetRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api', apiDocsRoutes);
 
-// Public settings endpoint (no auth required)
-app.get('/api/settings', async (req, res) => {
+// Public settings endpoint (no auth required, but rate limited)
+app.get('/api/settings', publicApiLimiter, async (req, res) => {
   try {
     let settings = await Settings.findOne();
     if (!settings) {
@@ -73,6 +87,11 @@ app.get('/api/settings', async (req, res) => {
     console.error('Get settings error:', error);
     res.status(500).json({ message: 'Server error' });
   }
+});
+
+// Root route - API Documentation
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/api-docs.html'));
 });
 
 // Shortcut redirect route
