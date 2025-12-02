@@ -195,15 +195,27 @@ const Contact: React.FC = () => {
                   <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                     Subject <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="text"
+                  <select
                     name="subject"
                     value={formData.subject}
-                    onChange={handleChange}
+                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                     required
-                    className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 dark:bg-gray-700 dark:text-white transition-all"
-                    placeholder="How can we help?"
-                  />
+                    className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 dark:bg-gray-700 dark:text-white transition-all appearance-none cursor-pointer"
+                  >
+                    <option value="" disabled>Select a subject...</option>
+                    <option value="General Inquiry">💬 General Inquiry</option>
+                    <option value="Technical Support">🔧 Technical Support</option>
+                    <option value="Bug Report">🐛 Bug Report</option>
+                    <option value="Feature Request">✨ Feature Request</option>
+                    <option value="Account Issue">👤 Account Issue</option>
+                    <option value="Billing Question">💳 Billing Question</option>
+                    <option value="Partnership Opportunity">🤝 Partnership Opportunity</option>
+                    <option value="Feedback">💡 Feedback</option>
+                    <option value="Other">📌 Other</option>
+                  </select>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    Choose the category that best describes your inquiry
+                  </p>
                 </div>
 
                 <div>
