@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../../lib/axios';
-import { Users, Link2, Settings, Trash2, Shield, AlertCircle, CheckCircle, Search, Edit, X, Plus, ExternalLink, CheckCircle2, XCircle } from 'lucide-react';
+import { Users, Link2, Settings, Trash2, Shield, AlertCircle, CheckCircle, Search, Edit, X, Plus, ExternalLink, CheckCircle2, XCircle, KeyRound } from 'lucide-react';
+import AdminChangePasswordModal from '../../components/AdminChangePasswordModal';
 
 interface User {
   _id: string;
@@ -80,6 +81,10 @@ const AdminManage: React.FC = () => {
     shortCode: ''
   });
   const [editingShortcut, setEditingShortcut] = useState<UserShortcut | null>(null);
+
+  // Password change modal states
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [passwordChangeUser, setPasswordChangeUser] = useState<User | null>(null);
 
   useEffect(() => {
     if (activeTab === 'users') fetchUsers();
@@ -182,6 +187,16 @@ const AdminManage: React.FC = () => {
       setError(err.response?.data?.message || 'Failed to update verification');
       setTimeout(() => setError(''), 3000);
     }
+  };
+
+  const handleOpenPasswordModal = (user: User) => {
+    setPasswordChangeUser(user);
+    setIsPasswordModalOpen(true);
+  };
+
+  const handleClosePasswordModal = () => {
+    setIsPasswordModalOpen(false);
+    setPasswordChangeUser(null);
   };
 
   const handleDeleteUser = async (id: string) => {
@@ -485,6 +500,13 @@ const AdminManage: React.FC = () => {
                                 title="Edit user"
                               >
                                 <Edit className="w-5 h-5" />
+                              </button>
+                              <button
+                                onClick={() => handleOpenPasswordModal(user)}
+                                className="p-2 text-purple-600 hover:bg-purple-50 dark:text-purple-400 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                                title="Change password"
+                              >
+                                <KeyRound className="w-5 h-5" />
                               </button>
                               <button
                                 onClick={() => handleToggleRole(user._id, user.role)}
@@ -974,6 +996,16 @@ const AdminManage: React.FC = () => {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Admin Change Password Modal */}
+        {passwordChangeUser && (
+          <AdminChangePasswordModal
+            isOpen={isPasswordModalOpen}
+            onClose={handleClosePasswordModal}
+            userId={passwordChangeUser._id}
+            username={passwordChangeUser.username}
+          />
         )}
       </div>
     </div>
