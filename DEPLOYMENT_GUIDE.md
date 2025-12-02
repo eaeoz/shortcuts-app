@@ -31,10 +31,12 @@ Your backend is already configured for production. The `src/server.ts` uses envi
    - Branch: `main` (or your default branch)
 
 3. **Configure Build Settings**:
-   - **Builder**: Dockerfile or Buildpack (choose Buildpack)
-   - **Build command**: `npm install`
+   - **Builder**: Buildpack (Node.js)
+   - **Work directory**: `/` (root directory - leave empty or set to `/`)
+   - **Build command**: `npm install && npm run build`
    - **Run command**: `npm start`
    - **Port**: `5000`
+   - **Instance type**: Select appropriate size (Free tier or Nano for testing)
 
 4. **Set Environment Variables**:
    
@@ -256,6 +258,23 @@ Redeploy the backend for changes to take effect.
 ### Issue: CORS Errors
 
 **Solution**: Ensure `CLIENT_URL` in Koyeb matches your Netlify URL exactly (including https://).
+
+### Issue: npm start Not Starting App
+
+**Solution**:
+1. Ensure build command is: `npm install && npm run build`
+2. This compiles TypeScript to `dist/` folder
+3. The start command `npm start` runs `node dist/server.js`
+4. Check Koyeb logs for build errors
+5. Verify TypeScript compiled successfully
+
+### Issue: "Cannot find module dist/server.js"
+
+**Solution**:
+1. Build command must include `npm run build`
+2. Full build command: `npm install && npm run build`
+3. This creates the `dist/` folder with compiled JavaScript
+4. Work directory should be `/` (root)
 
 ### Issue: API Not Connecting
 

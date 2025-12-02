@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+// import { useAuth } from '../context/AuthContext'; // Commented out - not used
 import axios from '../lib/axios';
 import { Link2, Plus, Trash2, Edit2, Copy, ExternalLink, AlertCircle, CheckCircle, X } from 'lucide-react';
 

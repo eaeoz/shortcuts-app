@@ -4,7 +4,7 @@ import { useSettings } from '../../context/SettingsContext';
 import { Settings, Save, RefreshCw, CheckCircle, AlertCircle, Globe, Image, FileText, Tag } from 'lucide-react';
 
 const AdminSettings: React.FC = () => {
-  const { settings: currentSettings, refreshSettings } = useSettings();
+  const { settings: _currentSettings, refreshSettings } = useSettings();
   const [formData, setFormData] = useState({
     siteTitle: '',
     siteIcon: '',

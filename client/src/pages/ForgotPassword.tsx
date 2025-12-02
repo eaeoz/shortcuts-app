@@ -4,7 +4,7 @@ import { Mail, Lock, ArrowLeft, CheckCircle, AlertCircle, Key } from 'lucide-rea
 import { useTheme } from '../context/ThemeContext';
 
 const ForgotPassword: React.FC = () => {
-  const { theme } = useTheme();
+  const { theme: _theme } = useTheme();
   const [step, setStep] = useState<'email' | 'code'>('email');
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
