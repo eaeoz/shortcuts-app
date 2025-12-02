@@ -446,7 +446,10 @@ router.get('/me', auth as any, async (req: any, res: Response) => {
 // Google OAuth Routes
 router.get(
   '/google',
-  passport.authenticate('google', { scope: ['profile', 'email'] })
+  passport.authenticate('google', { 
+    scope: ['profile', 'email'],
+    prompt: 'select_account'  // Force account selection
+  })
 );
 
 router.get(
