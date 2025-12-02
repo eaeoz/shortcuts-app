@@ -25,8 +25,11 @@ const AuthCallback = () => {
 
         console.log('Cookie set successfully:', response.data);
 
-        // Redirect to dashboard (AuthContext will automatically fetch user)
-        navigate('/dashboard');
+        // Wait a moment to ensure cookie is set in browser
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // Force reload to let AuthContext pick up the new cookie
+        window.location.href = '/dashboard';
       } catch (error: any) {
         console.error('Auth callback error:', error);
         setError(error.response?.data?.message || 'Authentication failed');
