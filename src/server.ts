@@ -52,6 +52,7 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrcAttr: ["'unsafe-inline'"], // Allow inline event handlers (onclick, etc.)
       imgSrc: ["'self'", "data:", "https:"],
     },
   },
@@ -153,6 +154,63 @@ app.get('/api/settings', publicApiLimiter, async (req, res) => {
   } catch (error) {
     console.error('Get settings error:', error);
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// API Status endpoint
+app.get('/api/status', publicApiLimiter, (req, res) => {
+  res.json({
+    online: true,
+    version: '1.0.0',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+// Health Check endpoint with system information
+app.get('/api/health', publicApiLimiter, async (req, res) => {
+  try {
+    // Import User model
+    const User = (await import('./models/User')).default;
+    
+    // Get database counts
+    const userCount = await User.countDocuments();
+    const shortcutCount = await Shortcut.countDocuments();
+    
+    // Calculate uptime
+    const uptime = process.uptime();
+    
+    // Get memory usage
+    const memUsage = process.memoryUsage();
+    const memUsed = Math.round(memUsage.heapUsed / 1024 / 1024); // Convert to MB
+    const memTotal = Math.round(memUsage.heapTotal / 1024 / 1024); // Convert to MB
+    
+    res.json({
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      uptime: Math.floor(uptime),
+      database: {
+        connected: true,
+        users: userCount,
+        shortcuts: shortcutCount
+      },
+      system: {
+        memory: {
+          used: memUsed,
+          total: memTotal,
+          percentage: Math.round((memUsed / memTotal) * 100)
+        },
+        node_version: process.version,
+        platform: process.platform
+      }
+    });
+  } catch (error) {
+    console.error('Health check error:', error);
+    res.status(503).json({
+      status: 'unhealthy',
+      timestamp: new Date().toISOString(),
+      error: 'Database connection failed or error retrieving health data'
+    });
   }
 });
 
