@@ -372,6 +372,14 @@ router.post(
         return res.status(400).json({ message: 'Invalid credentials' });
       }
 
+      // Check if user is verified
+      if (!user.isVerified) {
+        return res.status(403).json({ 
+          message: 'Your account is unverified or suspended. Please contact administrator.',
+          status: 'unverified'
+        });
+      }
+
       // Update last login
       user.lastLogin = new Date();
       await user.save();
