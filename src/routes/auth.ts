@@ -52,13 +52,19 @@ console.log('  isProduction:', isProduction);
 
 // Cookie settings for cross-site auth
 const getCookieSettings = () => {
-  const settings = {
+  const settings: any = {
     httpOnly: true,
     maxAge: USER_TIMEOUT,
     sameSite: isProduction ? ('none' as const) : ('lax' as const),
     secure: isProduction ? true : false,
     path: '/',
   };
+  
+  // Add partitioned attribute for Chrome's new cookie requirements
+  if (isProduction) {
+    settings.partitioned = true;
+  }
+  
   console.log('  Cookie Settings:', settings);
   return settings;
 };
