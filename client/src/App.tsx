@@ -13,6 +13,10 @@ import AdminManage from './pages/admin/AdminManage';
 import AdminSettings from './pages/admin/AdminSettings';
 import ShortcutRedirect from './pages/ShortcutRedirect';
 import TestAuth from './pages/TestAuth';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import Terms from './pages/Terms';
+import About from './pages/About';
+import Contact from './pages/Contact';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
@@ -46,6 +50,7 @@ const AppContent: React.FC = () => {
   const { user, loading } = useAuth();
   const location = window.location.pathname;
   const isAuthPage = location === '/login' || location === '/register';
+  const isPublicPage = location === '/privacy' || location === '/terms' || location === '/about' || location === '/contact';
 
   if (loading) {
     return (
@@ -68,10 +73,14 @@ const AppContent: React.FC = () => {
           <Route path="/admin/settings" element={<AdminRoute><AdminSettings /></AdminRoute>} />
           <Route path="/s/:code" element={<ShortcutRedirect />} />
           <Route path="/test-auth" element={<TestAuth />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
         </Routes>
       </main>
-      {!isAuthPage && <Footer />}
+      {(!isAuthPage || isPublicPage) && <Footer />}
     </div>
   );
 };
