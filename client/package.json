@@ -11,8 +11,10 @@
   },
   "dependencies": {
     "@netlify/functions": "^5.1.0",
+    "@types/dompurify": "^3.0.5",
     "@types/nodemailer": "^7.0.4",
     "axios": "^1.13.2",
+    "dompurify": "^3.3.0",
     "lucide-react": "^0.555.0",
     "nodemailer": "^7.0.11",
     "react": "^19.2.0",
