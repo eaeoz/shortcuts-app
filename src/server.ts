@@ -1,4 +1,7 @@
 import express from 'express';
+import helmet from 'helmet';
+import hpp from 'hpp';
+import compression from 'compression';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
@@ -36,7 +39,27 @@ const PORT = process.env.PORT || 5000;
 // Connect to database
 connectDB();
 
-// Middleware
+// Security Middleware
+// 1. Helmet - Sets various HTTP headers for security
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+  crossOriginEmbedderPolicy: false,
+}));
+
+// 2. Prevent HTTP Parameter Pollution
+app.use(hpp());
+
+// 3. Compression middleware for response compression
+app.use(compression());
+
+// CORS Middleware
 app.use(cors({
   origin: [
     process.env.CLIENT_URL || 'http://localhost:5173',
@@ -44,8 +67,35 @@ app.use(cors({
   ],
   credentials: true
 }));
-app.use(express.json());
+
+// Body parsing middleware with limit
+app.use(express.json({ limit: '10kb' })); // Limit payload size
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(cookieParser());
+
+// Manual NoSQL injection prevention middleware
+app.use((req, res, next) => {
+  // Sanitize an object by removing dangerous keys
+  const sanitize = (obj: any): void => {
+    if (obj && typeof obj === 'object' && !Array.isArray(obj)) {
+      Object.keys(obj).forEach(key => {
+        // Remove keys starting with $ or containing .
+        if (key.startsWith('$') || key.includes('.')) {
+          delete obj[key];
+        } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+          sanitize(obj[key]);
+        }
+      });
+    }
+  };
+
+  // Only sanitize body (query and params are read-only in Express 5)
+  if (req.body && typeof req.body === 'object') {
+    sanitize(req.body);
+  }
+  
+  next();
+});
 
 // Session middleware (required for Passport)
 app.use(
