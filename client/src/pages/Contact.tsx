@@ -17,8 +17,8 @@ const Contact: React.FC = () => {
     setErrorMessage('');
 
     try {
-      // When deployed to Netlify, this will call the serverless function
-      const response = await fetch('/.netlify/functions/contact', {
+      // Call the backend API endpoint
+      const response = await fetch('http://localhost:5000/api/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

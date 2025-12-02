@@ -7,6 +7,7 @@ import connectDB from './config/database';
 import authRoutes from './routes/auth';
 import shortcutRoutes from './routes/shortcuts';
 import adminRoutes from './routes/admin';
+import contactRoutes from './routes/contact';
 import Settings from './models/Settings';
 import Shortcut from './models/Shortcut';
 
@@ -20,7 +21,10 @@ connectDB();
 
 // Middleware
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: [
+    process.env.CLIENT_URL || 'http://localhost:5173',
+    'http://localhost:8888' // Netlify Dev
+  ],
   credentials: true
 }));
 app.use(express.json());
@@ -30,6 +34,7 @@ app.use(cookieParser());
 app.use('/api/auth', authRoutes);
 app.use('/api/shortcuts', shortcutRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/contact', contactRoutes);
 
 // Public settings endpoint (no auth required)
 app.get('/api/settings', async (req, res) => {

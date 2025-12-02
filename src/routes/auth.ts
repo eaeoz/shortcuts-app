@@ -2,16 +2,31 @@ import express, { Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { body, validationResult } from 'express-validator';
+import rateLimit from 'express-rate-limit';
 import User from '../models/User';
 import { auth, AuthRequest } from '../middleware/auth';
 
 const router = express.Router();
+
+// Rate limiter for authentication endpoints
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 requests per windowMs
+  message: {
+    message: 'Too many authentication attempts from this IP, please try again after 15 minutes'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  // Skip successful requests (only count failed attempts)
+  skipSuccessfulRequests: true,
+});
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 const USER_TIMEOUT = parseInt(process.env.USER_TIMEOUT || '1440') * 60 * 1000; // Convert minutes to milliseconds
 
-// Register
+// Register (with rate limiting)
 router.post(
   '/register',
+  authLimiter,
   [
     body('username').trim().isLength({ min: 3 }).withMessage('Username must be at least 3 characters'),
     body('email').isEmail().withMessage('Please provide a valid email'),
@@ -71,9 +86,10 @@ router.post(
   }
 );
 
-// Login
+// Login (with rate limiting)
 router.post(
   '/login',
+  authLimiter,
   [
     body('email').isEmail().withMessage('Please provide a valid email'),
     body('password').exists().withMessage('Password is required')
