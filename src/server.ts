@@ -19,6 +19,7 @@ import apiDocsRoutes from './routes/api-docs';
 import Settings from './models/Settings';
 import Shortcut from './models/Shortcut';
 import rateLimit from 'express-rate-limit';
+import { exec } from 'child_process';
 
 dotenv.config();
 
@@ -252,7 +253,39 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`\n🚀 Server running on port ${PORT}\n`);
+  
+  // Log public IP using npx checkmyip (no installation needed)
+  console.log('╔═══════════════════════════════════════════════════════════════╗');
+  console.log('║                                                               ║');
+  console.log('║               📡  FETCHING PUBLIC IP ADDRESS...              ║');
+  console.log('║                                                               ║');
+  console.log('╚═══════════════════════════════════════════════════════════════╝\n');
+  
+  exec('npx -y checkmyip', (error, stdout, stderr) => {
+    console.log('\n');
+    console.log('╔═══════════════════════════════════════════════════════════════╗');
+    console.log('║                                                               ║');
+    
+    if (error) {
+      console.log('║         ⚠️  COULD NOT RETRIEVE PUBLIC IP ADDRESS            ║');
+      console.log('║                                                               ║');
+      console.log('║         Error:', error.message.substring(0, 40).padEnd(40), '║');
+    } else if (stderr) {
+      console.log('║         ⚠️  ERROR FETCHING IP ADDRESS                       ║');
+    } else {
+      const ip = stdout.trim();
+      console.log('║                   📡  PUBLIC IP ADDRESS                      ║');
+      console.log('║                                                               ║');
+      console.log(`║                        ${ip.padEnd(30)}         ║`);
+      console.log('║                                                               ║');
+      console.log('║   💡  Add this IP to MongoDB Atlas Network Access            ║');
+      console.log('║       or use in MongoDB Compass connection                   ║');
+    }
+    
+    console.log('║                                                               ║');
+    console.log('╚═══════════════════════════════════════════════════════════════╝\n');
+  });
 });
 
 export default app;
