@@ -442,7 +442,8 @@ const AdminManage: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="overflow-x-auto">
+                {/* Desktop Table View - Hidden on mobile */}
+                <div className="hidden lg:block overflow-x-auto">
                   <table className="w-full">
                     <thead className="bg-gray-50 dark:bg-gray-900/50">
                       <tr>
@@ -536,6 +537,98 @@ const AdminManage: React.FC = () => {
                     </tbody>
                   </table>
                 </div>
+
+                {/* Mobile Card View - Shown on mobile */}
+                <div className="lg:hidden space-y-4 p-4">
+                  {filteredAndSortedUsers.length === 0 ? (
+                    <div className="py-12 text-center text-gray-500 dark:text-gray-400">
+                      No users found matching your search
+                    </div>
+                  ) : (
+                    filteredAndSortedUsers.map((user) => (
+                      <div
+                        key={user._id}
+                        className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 space-y-3 border border-gray-200 dark:border-gray-600"
+                      >
+                        {/* User Header */}
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <button
+                              onClick={() => handleViewUserShortcuts(user)}
+                              className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-bold text-base hover:underline truncate block"
+                            >
+                              {user.username}
+                            </button>
+                            <p className="text-xs text-gray-600 dark:text-gray-400 truncate mt-0.5">{user.email}</p>
+                          </div>
+                          <div className="flex gap-1">
+                            <span className={`px-2 py-1 rounded-md text-xs font-semibold whitespace-nowrap ${
+                              user.role === 'admin'
+                                ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300'
+                                : 'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200'
+                            }`}>
+                              {user.role}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Status and Date */}
+                        <div className="flex items-center justify-between gap-2 text-xs">
+                          <button
+                            onClick={() => handleToggleVerification(user._id)}
+                            className={`px-2 py-1 rounded-md font-semibold flex items-center gap-1 transition-colors ${
+                              user.isVerified
+                                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+                                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
+                            }`}
+                          >
+                            {user.isVerified ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                            <span className="hidden xs:inline">{user.isVerified ? 'Verified' : 'Unverified'}</span>
+                          </button>
+                          <span className="text-gray-500 dark:text-gray-400">
+                            {new Date(user.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                          </span>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="grid grid-cols-4 gap-1.5 pt-2 border-t border-gray-200 dark:border-gray-600">
+                          <button
+                            onClick={() => handleEditUser(user)}
+                            className="flex flex-col items-center gap-1 p-2 text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900/20 rounded-lg transition-colors"
+                            title="Edit"
+                          >
+                            <Edit className="w-4 h-4" />
+                            <span className="text-xs font-medium">Edit</span>
+                          </button>
+                          <button
+                            onClick={() => handleOpenPasswordModal(user)}
+                            className="flex flex-col items-center gap-1 p-2 text-purple-600 hover:bg-purple-50 dark:text-purple-400 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                            title="Password"
+                          >
+                            <KeyRound className="w-4 h-4" />
+                            <span className="text-xs font-medium">Pass</span>
+                          </button>
+                          <button
+                            onClick={() => handleToggleRole(user._id, user.role)}
+                            className="flex flex-col items-center gap-1 p-2 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                            title={`To ${user.role === 'admin' ? 'user' : 'admin'}`}
+                          >
+                            <Shield className="w-4 h-4" />
+                            <span className="text-xs font-medium">Role</span>
+                          </button>
+                          <button
+                            onClick={() => handleDeleteUser(user._id)}
+                            className="flex flex-col items-center gap-1 p-2 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            <span className="text-xs font-medium">Delete</span>
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
             )}
 
@@ -569,7 +662,8 @@ const AdminManage: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="overflow-x-auto">
+                {/* Desktop Table View - Hidden on mobile */}
+                <div className="hidden lg:block overflow-x-auto">
                   <table className="w-full">
                     <thead className="bg-gray-50 dark:bg-gray-900/50">
                       <tr>
@@ -635,6 +729,66 @@ const AdminManage: React.FC = () => {
                       )}
                     </tbody>
                   </table>
+                </div>
+
+                {/* Mobile Card View - Shown on mobile */}
+                <div className="lg:hidden space-y-4 p-4">
+                  {filteredAndSortedShortcuts.length === 0 ? (
+                    <div className="py-12 text-center text-gray-500 dark:text-gray-400">
+                      No shortcuts found matching your search
+                    </div>
+                  ) : (
+                    filteredAndSortedShortcuts.map((shortcut) => (
+                      <div
+                        key={shortcut._id}
+                        className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 space-y-3 border border-gray-200 dark:border-gray-600"
+                      >
+                        {/* Shortcut Header */}
+                        <div className="flex items-center justify-between gap-2">
+                          <code className="inline-flex items-center gap-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 px-2 py-1 rounded-lg font-mono text-sm font-bold flex-shrink-0">
+                            <Link2 className="w-4 h-4" />
+                            {shortcut.shortCode}
+                          </code>
+                          <span className="inline-flex items-center gap-1 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-2 py-1 rounded-lg font-bold text-xs whitespace-nowrap">
+                            {shortcut.clicks} clicks
+                          </span>
+                        </div>
+
+                        {/* URL */}
+                        <div className="bg-white dark:bg-gray-800 rounded-lg p-2 border border-gray-200 dark:border-gray-600">
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Target URL:</p>
+                          <p className="text-xs text-gray-700 dark:text-gray-300 break-all line-clamp-2" title={shortcut.originalUrl}>
+                            {shortcut.originalUrl}
+                          </p>
+                        </div>
+
+                        {/* Owner and Actions */}
+                        <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-200 dark:border-gray-600">
+                          <button
+                            onClick={() => {
+                              const user = users.find(u => u._id === shortcut.userId?._id);
+                              if (user) handleViewUserShortcuts(user);
+                            }}
+                            className="flex items-center gap-2 hover:bg-white dark:hover:bg-gray-800 px-2 py-1.5 rounded-lg transition-colors flex-1 min-w-0"
+                          >
+                            <div className="w-6 h-6 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
+                              {shortcut.userId?.username?.charAt(0).toUpperCase() || 'U'}
+                            </div>
+                            <span className="text-xs font-medium text-gray-900 dark:text-white truncate">
+                              {shortcut.userId?.username || 'Unknown'}
+                            </span>
+                          </button>
+                          <button
+                            onClick={() => handleDeleteShortcutFromList(shortcut._id)}
+                            className="p-2 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 rounded-lg transition-colors flex-shrink-0"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             )}
