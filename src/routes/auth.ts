@@ -43,6 +43,25 @@ const authLimiter = rateLimit({
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 const USER_TIMEOUT = parseInt(process.env.USER_TIMEOUT || '1440') * 60 * 1000; // Convert minutes to milliseconds
 
+// Detect if we're in production (cross-site deployment)
+const isProduction = !!(process.env.CLIENT_URL && !process.env.CLIENT_URL.includes('localhost'));
+
+console.log('🔧 Cookie Configuration:');
+console.log('  CLIENT_URL:', process.env.CLIENT_URL);
+console.log('  isProduction:', isProduction);
+
+// Cookie settings for cross-site auth
+const getCookieSettings = () => {
+  const settings = {
+    httpOnly: true,
+    maxAge: USER_TIMEOUT,
+    sameSite: isProduction ? ('none' as const) : ('lax' as const),
+    secure: isProduction ? true : false
+  };
+  console.log('  Cookie Settings:', settings);
+  return settings;
+};
+
 // Send verification code for registration
 router.post(
   '/send-verification',
@@ -257,12 +276,7 @@ router.post(
       // Create token
       const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: `${USER_TIMEOUT}ms` });
 
-      res.cookie('token', token, {
-        httpOnly: true,
-        maxAge: USER_TIMEOUT,
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        secure: process.env.NODE_ENV === 'production'
-      });
+      res.cookie('token', token, getCookieSettings());
 
       console.log(`✅ User registered successfully: ${email}`);
 
@@ -325,12 +339,7 @@ router.post(
       // Create token
       const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: `${USER_TIMEOUT}ms` });
 
-      res.cookie('token', token, {
-        httpOnly: true,
-        maxAge: USER_TIMEOUT,
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        secure: process.env.NODE_ENV === 'production'
-      });
+      res.cookie('token', token, getCookieSettings());
 
       res.status(201).json({
         message: 'User registered successfully',
@@ -393,12 +402,7 @@ router.post(
       // Create token
       const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: `${USER_TIMEOUT}ms` });
 
-      res.cookie('token', token, {
-        httpOnly: true,
-        maxAge: USER_TIMEOUT,
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        secure: process.env.NODE_ENV === 'production'
-      });
+      res.cookie('token', token, getCookieSettings());
 
       res.json({
         message: 'Login successful',
@@ -476,12 +480,7 @@ router.get(
       const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: `${USER_TIMEOUT}ms` });
 
       // Set cookie
-      res.cookie('token', token, {
-        httpOnly: true,
-        maxAge: USER_TIMEOUT,
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        secure: process.env.NODE_ENV === 'production'
-      });
+      res.cookie('token', token, getCookieSettings());
 
       // Redirect to dashboard
       res.redirect(`${process.env.CLIENT_URL}/dashboard`);

@@ -110,6 +110,9 @@ app.use((req, res, next) => {
   next();
 });
 
+// Detect production environment for cross-site cookies
+const isProduction = !!(process.env.CLIENT_URL && !process.env.CLIENT_URL.includes('localhost'));
+
 // Session middleware (required for Passport)
 app.use(
   session({
@@ -117,11 +120,10 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === 'production',
+      secure: isProduction,
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Required for cross-site cookies
-      domain: process.env.NODE_ENV === 'production' ? undefined : undefined, // Let browser handle domain
+      sameSite: isProduction ? 'none' : 'lax', // Required for cross-site cookies
     },
   })
 );
