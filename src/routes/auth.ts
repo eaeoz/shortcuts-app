@@ -409,10 +409,13 @@ router.post(
       // Create token
       const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: `${USER_TIMEOUT}ms` });
 
+      // Set cookie (will work on desktop browsers)
       res.cookie('token', token, getCookieSettings());
 
+      // Also return token in response body for mobile browsers that might block cookies
       res.json({
         message: 'Login successful',
+        token, // Include token for localStorage fallback
         user: {
           id: user._id,
           username: user.username,

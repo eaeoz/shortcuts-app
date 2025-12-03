@@ -58,6 +58,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     await axios.post('/api/auth/logout', {}, { withCredentials: true });
+    // Clear localStorage token for mobile browsers
+    localStorage.removeItem('auth_token');
     setUser(null);
   };
 

@@ -11,13 +11,25 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-producti
 
 export const auth = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const token = req.cookies.token || req.header('Authorization')?.replace('Bearer ', '');
+    // Try to get token from multiple sources (cookie first, then header)
+    let token = req.cookies.token;
+    
+    // If no cookie, try Authorization header
+    if (!token) {
+      const authHeader = req.header('Authorization');
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.replace('Bearer ', '');
+      }
+    }
 
     console.log('🔍 Auth Middleware Check:');
     console.log('  Cookies:', req.cookies);
+    console.log('  Authorization header:', req.header('Authorization') ? 'Present' : 'Missing');
     console.log('  Token found:', !!token);
+    console.log('  Token source:', req.cookies.token ? 'Cookie' : (token ? 'Header' : 'None'));
     console.log('  Origin:', req.get('origin'));
     console.log('  Referer:', req.get('referer'));
+    console.log('  User-Agent:', req.get('user-agent')?.substring(0, 100));
 
     if (!token) {
       res.status(401).json({ message: 'No authentication token, access denied' });
@@ -36,6 +48,7 @@ export const auth = async (req: AuthRequest, res: Response, next: NextFunction):
     req.userId = user._id.toString();
     next();
   } catch (error) {
+    console.error('Auth middleware error:', error);
     res.status(401).json({ message: 'Token is not valid' });
   }
 };
