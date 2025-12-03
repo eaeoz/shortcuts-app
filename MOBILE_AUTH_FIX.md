@@ -53,15 +53,20 @@ Implemented a **dual authentication system** that supports both cookie-based and
 - **No breaking changes**: Existing cookie-based auth continues to work
 - **Better debugging**: Enhanced logging shows token source and User-Agent
 
-## Testing on Tablet Firefox
+## Testing on Tablet/Mobile Browsers
 
 To verify the fix works:
 
-1. Clear browser data/cache
-2. Try logging in on tablet Firefox
+1. Clear browser data/cache and localStorage
+2. Try logging in (regular login or Google OAuth) on tablet/mobile browser
 3. Check browser console for: `🔐 Token stored in localStorage for mobile compatibility`
-4. Backend logs should show: `Token source: Header` instead of `Token source: Cookie`
+4. Backend logs should show: `Token source: Header` for subsequent requests
 5. Authentication should now work properly
+
+### For Google OAuth specifically:
+- The OAuth callback page now stores the token in localStorage immediately
+- Even if cookie setting fails (Safari/Firefox mobile), the token is available
+- The Authorization header will be used automatically on next request
 
 ## Security Notes
 

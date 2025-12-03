@@ -20,15 +20,22 @@ const AuthCallback = () => {
       try {
         console.log('Setting cookie with token...');
         
-        // Exchange token for cookie
-        const response = await axios.post('/api/auth/set-cookie', { token });
+        // Store token in localStorage immediately for mobile browser compatibility
+        localStorage.setItem('auth_token', token);
+        console.log('🔐 Token stored in localStorage for mobile compatibility');
+        
+        // Also try to exchange token for cookie (for desktop browsers)
+        try {
+          const response = await axios.post('/api/auth/set-cookie', { token });
+          console.log('✅ Cookie set successfully:', response.data);
+        } catch (cookieError) {
+          console.warn('⚠️ Cookie setting failed (expected on mobile), continuing with localStorage token');
+        }
 
-        console.log('Cookie set successfully:', response.data);
-
-        // Wait a moment to ensure cookie is set in browser
+        // Wait a moment to ensure everything is ready
         await new Promise(resolve => setTimeout(resolve, 100));
 
-        // Force reload to let AuthContext pick up the new cookie
+        // Force reload to let AuthContext pick up the authentication
         window.location.href = '/dashboard';
       } catch (error: any) {
         console.error('Auth callback error:', error);

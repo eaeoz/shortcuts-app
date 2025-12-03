@@ -485,6 +485,7 @@ router.post('/set-cookie', async (req: express.Request, res: Response) => {
 
     res.json({
       message: 'Cookie set successfully',
+      token, // Return token for mobile browsers
       user: {
         id: user._id,
         username: user.username,
